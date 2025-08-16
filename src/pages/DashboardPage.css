@@ -46,6 +46,7 @@
   width: 100%;
   min-height: 200px;
   box-sizing: border-box;
+  background: linear-gradient(135deg, var(--background-color-light) 0%, var(--background-color-secondary) 100%);
 }
 
 .card::before {
@@ -60,14 +61,31 @@
   transition: transform var(--transition-normal);
 }
 
+.card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
 .card:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-xl);
   border-color: var(--primary-color);
+  background: linear-gradient(135deg, var(--background-color-light) 0%, var(--primary-color-lighter) 100%);
 }
 
 .card:hover::before {
   transform: scaleX(1);
+}
+
+.card:hover::after {
+  opacity: 1;
 }
 
 .card h2 {
@@ -75,6 +93,13 @@
   margin-bottom: var(--spacing-md);
   color: var(--text-color);
   font-weight: var(--font-weight-semibold);
+  position: relative;
+  z-index: 1;
+  transition: color var(--transition-normal);
+}
+
+.card:hover h2 {
+  color: var(--primary-color);
 }
 
 .card p {
@@ -83,6 +108,32 @@
   line-height: var(--line-height-normal);
   margin: 0;
   flex-grow: 1;
+  position: relative;
+  z-index: 1;
+  transition: color var(--transition-normal);
+}
+
+.card:hover p {
+  color: var(--text-color);
+}
+
+/* 添加卡片图标 */
+.card::before {
+  content: '';
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  width: 40px;
+  height: 40px;
+  background: var(--primary-color-light);
+  border-radius: var(--border-radius-round);
+  opacity: 0.3;
+  transition: all var(--transition-normal);
+}
+
+.card:hover::before {
+  opacity: 0.6;
+  transform: scale(1.1);
 }
 
 /* 响应式设计 */

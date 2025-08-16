@@ -106,6 +106,7 @@
   font-weight: var(--font-weight-medium);
   width: 100%;
   box-sizing: border-box;
+  position: relative;
 }
 
 .sidebar a:hover {
@@ -120,6 +121,33 @@
   color: var(--primary-color);
   border-left-color: var(--primary-color);
   font-weight: var(--font-weight-semibold);
+  box-shadow: inset 0 0 0 1px var(--primary-color-light);
+}
+
+.sidebar li.active a::after {
+  content: '';
+  position: absolute;
+  right: var(--spacing-md);
+  width: 8px;
+  height: 8px;
+  background: var(--primary-color);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .menu-icon {
@@ -128,11 +156,21 @@
   width: 20px;
   text-align: center;
   flex-shrink: 0;
+  transition: transform var(--transition-normal);
+}
+
+.sidebar a:hover .menu-icon {
+  transform: scale(1.1);
 }
 
 .menu-label {
   font-size: var(--font-size-sm);
   flex: 1;
+  transition: transform var(--transition-normal);
+}
+
+.sidebar a:hover .menu-label {
+  transform: translateX(2px);
 }
 
 /* 移动端遮罩 */

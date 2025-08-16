@@ -465,6 +465,78 @@ textarea:disabled {
   background-color: var(--info-color-light);
 }
 
+/* 加载状态样式 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xxl);
+  text-align: center;
+  color: var(--text-color-secondary);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-color-light);
+  border-top: 3px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: var(--spacing-md);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: var(--font-size-base);
+  color: var(--text-color-secondary);
+  margin: 0;
+}
+
+/* 空状态样式 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xxl);
+  text-align: center;
+  color: var(--text-color-secondary);
+  background: var(--background-color-light);
+  border-radius: var(--border-radius-lg);
+  border: 2px dashed var(--border-color-light);
+  margin: var(--spacing-lg) 0;
+}
+
+.empty-state-icon {
+  font-size: var(--font-size-4xl);
+  margin-bottom: var(--spacing-md);
+  opacity: 0.5;
+}
+
+.empty-state-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-color);
+  margin-bottom: var(--spacing-sm);
+}
+
+.empty-state-description {
+  font-size: var(--font-size-base);
+  color: var(--text-color-secondary);
+  margin-bottom: var(--spacing-lg);
+  max-width: 400px;
+  line-height: var(--line-height-relaxed);
+}
+
+.empty-state-action {
+  margin-top: var(--spacing-md);
+}
+
 /* 通用工具类 */
 .text-center { text-align: center; }
 .text-left { text-align: left; }
@@ -539,5 +611,70 @@ textarea:disabled {
   
   .hidden-xs {
     display: none !important;
+  }
+}
+
+/* 页面过渡动画 */
+.page-transition {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 卡片进入动画 */
+.card-enter {
+  animation: cardSlideIn 0.4s ease-out;
+}
+
+@keyframes cardSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 表格行进入动画 */
+.table-row-enter {
+  animation: rowSlideIn 0.3s ease-out;
+}
+
+@keyframes rowSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 按钮点击动画 */
+.btn-click {
+  animation: buttonClick 0.15s ease-out;
+}
+
+@keyframes buttonClick {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
   }
 }
