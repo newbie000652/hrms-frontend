@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getResignations, getResignationDetails } from '../services/resignationService';
 import Modal from '../components/Modal';
+import Pagination from '../components/Pagination';
 import './ResignationPage.css';
 
 const ResignationPage = () => {
@@ -11,23 +12,34 @@ const ResignationPage = () => {
     const [viewingResignation, setViewingResignation] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [totalRecords, setTotalRecords] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
     const [search, setSearch] = useState({ employeeId: '', employeeName: '', level: '', department: '' });
 
     useEffect(() => {
         const fetchResignations = async () => {
             try {
-                const data = await getResignations(currentPage, 10, search);
+                const data = await getResignations(currentPage, pageSize, search);
                 setResignations(data.records);
-                setTotalPages(data.total);
+                setTotalRecords(data.total);
+                // 计算总页数
+                const calculatedTotalPages = Math.ceil(data.total / pageSize);
+                setTotalPages(calculatedTotalPages);
+                // 如果当前页超出总页数，重置为第一页
+                if (currentPage > calculatedTotalPages && calculatedTotalPages > 0) {
+                    setCurrentPage(1);
+                }
             } catch (err) {
                 setError('加载离职数据失败，请稍后重试。');
                 setResignations([]);
+                setTotalPages(1);
+                setTotalRecords(0);
             } finally {
                 setIsLoading(false);
             }
         };
         fetchResignations();
-    }, [currentPage, search]);
+    }, [currentPage, pageSize, search]);
 
     const handleViewDetails = async (id) => {
         try {
@@ -43,6 +55,11 @@ const ResignationPage = () => {
         setCurrentPage(page);
     };
 
+    const handlePageSizeChange = (newPageSize) => {
+        setPageSize(newPageSize);
+        setCurrentPage(1); // 重置到第一页
+    };
+
     const handleSearchChange = (e) => {
         setSearch({ ...search, [e.target.name]: e.target.value });
     };
@@ -50,6 +67,15 @@ const ResignationPage = () => {
     const handleSearch = () => {
         setCurrentPage(1);
     };
+
+    // 计算当前页的记录序号范围
+    const getRecordRange = () => {
+        const start = (currentPage - 1) * pageSize + 1;
+        const end = Math.min(currentPage * pageSize, totalRecords);
+        return { start, end };
+    };
+
+    const { start, end } = getRecordRange();
 
     return (
         <div className="resignation-page">
@@ -94,6 +120,7 @@ const ResignationPage = () => {
                         <table className="employee-table">
                             <thead>
                                 <tr>
+                                    <th width="60">序号</th>
                                     <th>ID</th>
                                     <th>姓名</th>
                                     <th>级别</th>
@@ -103,8 +130,9 @@ const ResignationPage = () => {
                             </thead>
                             <tbody>
                                 {resignations.length > 0 ? (
-                                    resignations.map((resignation) => (
+                                    resignations.map((resignation, index) => (
                                         <tr key={resignation.id}>
+                                            <td className="record-number">{start + index}</td>
                                             <td>{resignation.id}</td>
                                             <td>{resignation.name}</td>
                                             <td>{resignation.levelId}</td>
@@ -116,29 +144,26 @@ const ResignationPage = () => {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="5" className="no-data">暂无离职数据。</td>
+                                        <td colSpan="6" className="no-data">暂无离职数据。</td>
                                     </tr>
                                 )}
                             </tbody>
                         </table>
                     </div>
-                    <div className="pagination">
-                        <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
-                            &lt;
-                        </button>
-                        {Array.from({ length: totalPages }, (_, index) => (
-                            <button
-                                key={index + 1}
-                                className={currentPage === index + 1 ? 'active' : ''}
-                                onClick={() => handlePageChange(index + 1)}
-                            >
-                                {index + 1}
-                            </button>
-                        ))}
-                        <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
-                            &gt;
-                        </button>
-                    </div>
+                    
+                    {/* 使用通用分页组件 */}
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        totalRecords={totalRecords}
+                        pageSize={pageSize}
+                        onPageChange={handlePageChange}
+                        onPageSizeChange={handlePageSizeChange}
+                        showPageSizeSelector={true}
+                        showJumpToPage={true}
+                        showRecordInfo={true}
+                        pageSizeOptions={[5, 10, 20, 50]}
+                    />
                 </>
             )}
 
@@ -146,25 +171,25 @@ const ResignationPage = () => {
                 <Modal title="离职详情" onClose={() => setModalOpen(false)}>
                     <div className="resignation-details">
                         <h3>基本信息</h3>
-                        <p>编号: {viewingResignation.id || '未提供'}</p>
-                        <p>姓名: {viewingResignation.name || '未提供'}</p>
-                        <p>性别: {viewingResignation.gender || '未提供'}</p>
-                        <p>邮箱: {viewingResignation.email || '未提供'}</p>
-                        <p>电话: {viewingResignation.phone || '未提供'}</p>
-                        <p>入职日期: {viewingResignation.entryDate ? new Date(viewingResignation.entryDate).toLocaleDateString() : '未提供'}</p>
-                        <p>状态: {viewingResignation.isActive ? '在职' : '离职'}</p>
+                        <p>编号: {viewingResignation?.id || '未提供'}</p>
+                        <p>姓名: {viewingResignation?.name || '未提供'}</p>
+                        <p>性别: {viewingResignation?.gender || '未提供'}</p>
+                        <p>邮箱: {viewingResignation?.email || '未提供'}</p>
+                        <p>电话: {viewingResignation?.phone || '未提供'}</p>
+                        <p>入职日期: {viewingResignation?.entryDate ? new Date(viewingResignation.entryDate).toLocaleDateString() : '未提供'}</p>
+                        <p>状态: {viewingResignation?.isActive ? '在职' : '离职'}</p>
 
                         <h3>部门信息</h3>
-                        <p>部门编号: {viewingResignation.departmentId || '未分配'}</p>
-                        <p>部门名称: {viewingResignation.departmentName || '未提供'}</p>
+                        <p>部门编号: {viewingResignation?.departmentId || '未分配'}</p>
+                        <p>部门名称: {viewingResignation?.departmentName || '未提供'}</p>
 
                         <h3>级别信息</h3>
-                        <p>级别编号: {viewingResignation.levelId || '未分配'}</p>
-                        <p>级别名称: {viewingResignation.levelName || '未提供'}</p>
-                        <p>基础薪资: {viewingResignation.baseSalary ? `¥${viewingResignation.baseSalary}` : '未提供'}</p>
+                        <p>级别编号: {viewingResignation?.levelId || '未分配'}</p>
+                        <p>级别名称: {viewingResignation?.levelName || '未提供'}</p>
+                        <p>基础薪资: {viewingResignation?.baseSalary ? `¥${viewingResignation.baseSalary}` : '未提供'}</p>
 
                         <h3>技能信息</h3>
-                        {viewingResignation.skillNames && viewingResignation.skillNames.length > 0 ? (
+                        {viewingResignation?.skillNames && viewingResignation.skillNames.length > 0 ? (
                             <ul>
                                 {viewingResignation.skillNames.map((skill, index) => (
                                     <li key={index}>{skill}</li>
@@ -177,8 +202,6 @@ const ResignationPage = () => {
                         <button onClick={() => setModalOpen(false)}>关闭</button>
                     </div>
                 </Modal>
-
-
             )}
         </div>
     );

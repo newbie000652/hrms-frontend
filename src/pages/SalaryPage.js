@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { getSalaries, createDefaultSalary, calculateSalary, updateSalary, deleteSalary } from '../services/salaryService';
 import Modal from '../components/Modal';
 import SalaryForm from '../components/Form/SalaryForm';
+import Pagination from '../components/Pagination';
 import './salaryPage.css';
 
 const SalaryPage = () => {
@@ -13,23 +14,35 @@ const SalaryPage = () => {
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [totalRecords, setTotalRecords] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
     const [search, setSearch] = useState({ searchBy: '', keyword: '' });
 
     useEffect(() => {
         const fetchSalaries = async () => {
             try {
-                const data = await getSalaries(currentPage, 10, search.searchBy, search.keyword);
-                setSalaries(data.records);
-                setTotalPages(data.total);
+                console.log('Fetching salaries with params:', { currentPage, pageSize, search });
+                const data = await getSalaries(currentPage, pageSize, search.searchBy, search.keyword);
+                console.log('Received salary data:', data);
+                console.log('Data records:', data.records);
+                console.log('Data total:', data.total);
+                console.log('Data pages:', data.pages);
+                
+                setSalaries(data.records || []);
+                setTotalPages(data.pages || Math.ceil((data.total || 0) / pageSize));
+                setTotalRecords(data.total || 0);
             } catch (err) {
+                console.error('Error fetching salaries:', err);
                 setError('加载工资信息失败');
                 setSalaries([]);
+                setTotalPages(1);
+                setTotalRecords(0);
             } finally {
                 setIsLoading(false);
             }
         };
         fetchSalaries();
-    }, [currentPage, search]);
+    }, [currentPage, pageSize, search]);
 
     const handleSaveSalary = async (salary) => {
         try {
@@ -67,6 +80,11 @@ const SalaryPage = () => {
         setCurrentPage(page);
     };
 
+    const handlePageSizeChange = (newPageSize) => {
+        setPageSize(newPageSize);
+        setCurrentPage(1); // 重置到第一页
+    };
+
     const handleSearchChange = (e) => {
         setSearch({ ...search, [e.target.name]: e.target.value });
     };
@@ -74,6 +92,15 @@ const SalaryPage = () => {
     const handleSearch = () => {
         setCurrentPage(1);
     };
+
+    // 计算当前页的记录序号范围
+    const getRecordRange = () => {
+        const start = (currentPage - 1) * pageSize + 1;
+        const end = Math.min(currentPage * pageSize, totalRecords);
+        return { start, end };
+    };
+
+    const { start, end } = getRecordRange();
 
     return (
         <div className="salary-page">
@@ -104,6 +131,7 @@ const SalaryPage = () => {
                         <table className="salary-table">
                             <thead>
                                 <tr>
+                                    <th width="60">序号</th>
                                     <th>员工编号</th>
                                     <th>基础薪资</th>
                                     <th>奖金</th>
@@ -114,40 +142,44 @@ const SalaryPage = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {salaries.map((salary) => (
-                                    <tr key={salary.id}>
-                                        <td>{salary.employeeId}</td>
-                                        <td>{salary.baseSalary}</td>
-                                        <td>{salary.bonus}</td>
-                                        <td>{salary.penalty}</td>
-                                        <td>{salary.createTime}</td>
-                                        <td>{salary.updateTime}</td>
-                                        <td>
-                                            <button onClick={() => handleEdit(salary)}>编辑</button>
-                                            <button onClick={() => handleDeleteSalary(salary.id)}>删除</button>
-                                        </td>
+                                {salaries.length > 0 ? (
+                                    salaries.map((salary, index) => (
+                                        <tr key={salary.id}>
+                                            <td className="record-number">{start + index}</td>
+                                            <td>{salary.employeeId}</td>
+                                            <td>{salary.baseSalary}</td>
+                                            <td>{salary.bonus}</td>
+                                            <td>{salary.penalty}</td>
+                                            <td>{salary.createTime}</td>
+                                            <td>{salary.updateTime}</td>
+                                            <td>
+                                                <button onClick={() => handleEdit(salary)}>编辑</button>
+                                                <button onClick={() => handleDeleteSalary(salary.id)}>删除</button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="8" className="no-data">暂无工资记录。</td>
                                     </tr>
-                                ))}
+                                )}
                             </tbody>
                         </table>
                     </div>
-                    <div className="pagination">
-                        <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
-                            &larr;
-                        </button>
-                        {[...Array(totalPages)].map((_, index) => (
-                            <button
-                                key={index}
-                                onClick={() => handlePageChange(index + 1)}
-                                className={index + 1 === currentPage ? 'active' : ''}
-                            >
-                                {index + 1}
-                            </button>
-                        ))}
-                        <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
-                            &rarr;
-                        </button>
-                    </div>
+                    
+                    {/* 使用通用分页组件 */}
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        totalRecords={totalRecords}
+                        pageSize={pageSize}
+                        onPageChange={handlePageChange}
+                        onPageSizeChange={handlePageSizeChange}
+                        showPageSizeSelector={true}
+                        showJumpToPage={true}
+                        showRecordInfo={true}
+                        pageSizeOptions={[5, 10, 20, 50]}
+                    />
                 </>
             )}
 

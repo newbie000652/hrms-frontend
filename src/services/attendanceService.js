@@ -9,8 +9,10 @@ export const getAttendanceRecords = async (filter, page = 1, size = 10) => {
     return response.data;
 };
 
-export const getPendingLeaveRequests = async () => {
-    const response = await axios.get(`${API_URL}/pendingLeave`);
+export const getPendingLeaveRequests = async (page = 1, size = 10) => {
+    const response = await axios.get(`${API_URL}/pendingLeave`, {
+        params: { page, size },
+    });
     return response.data;
 };
 

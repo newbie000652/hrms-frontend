@@ -132,6 +132,14 @@
   background-color: var(--background-color-secondary);
 }
 
+/* 序号列样式 */
+.record-number {
+  text-align: center !important;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-color-muted);
+  background-color: var(--background-color-secondary);
+}
+
 .employee-table td button {
   padding: var(--spacing-sm) var(--spacing-md);
   margin: 0 var(--spacing-xs);
@@ -164,47 +172,6 @@
 
 .employee-table td button:last-child:hover {
   background-color: var(--error-color-hover);
-}
-
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: var(--spacing-sm);
-  margin-top: var(--spacing-xl);
-  width: 100%;
-}
-
-.pagination button {
-  margin: 0;
-  padding: var(--spacing-md) var(--spacing-md);
-  border: 1px solid var(--border-color);
-  background-color: var(--background-color-light);
-  color: var(--text-color-secondary);
-  cursor: pointer;
-  font-size: var(--font-size-sm);
-  border-radius: var(--border-radius-md);
-  transition: all var(--transition-normal);
-  min-width: 45px;
-}
-
-.pagination button:hover {
-  background-color: var(--background-color-secondary);
-  border-color: var(--primary-color);
-  color: var(--primary-color);
-}
-
-.pagination button.active {
-  background-color: var(--primary-color);
-  color: var(--text-color-light);
-  border-color: var(--primary-color);
-}
-
-.pagination button:disabled {
-  background-color: var(--background-color-secondary);
-  color: var(--text-color-muted);
-  cursor: not-allowed;
-  border-color: var(--border-color-light);
 }
 
 .no-data {
@@ -258,12 +225,6 @@
     padding: var(--spacing-xs) var(--spacing-sm);
     font-size: var(--font-size-xs);
     margin: var(--spacing-xs);
-  }
-  
-  .pagination button {
-    padding: var(--spacing-sm) var(--spacing-sm);
-    font-size: var(--font-size-xs);
-    min-width: 40px;
   }
 }
 

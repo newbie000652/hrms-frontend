@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getAccounts, addAccount, updateAccount, deleteAccount, getAccountById } from '../services/accountService';
 import Modal from '../components/Modal';
+import Pagination from '../components/Pagination';
 import './AccountPage.css';
 
 const AccountPage = () => {
@@ -11,16 +12,21 @@ const AccountPage = () => {
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [totalRecords, setTotalRecords] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
     const [search, setSearch] = useState({ accountId: '' });
 
     const fetchAccounts = async () => {
         try {
-            const data = await getAccounts(currentPage, 10, search.accountId);
+            const data = await getAccounts(currentPage, pageSize, search.accountId);
             setAccounts(data.records);
-            setTotalPages(data.total);
+            setTotalPages(data.pages || Math.ceil(data.total / pageSize));
+            setTotalRecords(data.total);
         } catch (err) {
             setError('加载账户失败');
             setAccounts([]);
+            setTotalPages(1);
+            setTotalRecords(0);
         } finally {
             setIsLoading(false);
         }
@@ -28,7 +34,7 @@ const AccountPage = () => {
 
     useEffect(() => {
         fetchAccounts();
-    }, [currentPage, search]);
+    }, [currentPage, pageSize, search]);
 
     const handleSaveAccount = async (account) => {
         try {
@@ -76,6 +82,11 @@ const AccountPage = () => {
         setCurrentPage(page);
     };
 
+    const handlePageSizeChange = (newPageSize) => {
+        setPageSize(newPageSize);
+        setCurrentPage(1); // 重置到第一页
+    };
+
     const handleSearchChange = (e) => {
         setSearch({ ...search, [e.target.name]: e.target.value });
     };
@@ -83,6 +94,15 @@ const AccountPage = () => {
     const handleSearch = () => {
         setCurrentPage(1);
     };
+
+    // 计算当前页的记录序号范围
+    const getRecordRange = () => {
+        const start = (currentPage - 1) * pageSize + 1;
+        const end = Math.min(currentPage * pageSize, totalRecords);
+        return { start, end };
+    };
+
+    const { start, end } = getRecordRange();
 
     return (
         <div className="account-page">
@@ -107,6 +127,7 @@ const AccountPage = () => {
                         <table className="account-table">
                             <thead>
                             <tr>
+                                <th width="60">序号</th>
                                 <th>ID</th>
                                 <th>账户</th>
                                 <th>员工ID</th>
@@ -115,32 +136,42 @@ const AccountPage = () => {
                             </tr>
                             </thead>
                             <tbody>
-                            {accounts.map((account) => (
-                                <tr key={account.id}>
-                                    <td>{account.id}</td>
-                                    <td>{account.account}</td>
-                                    <td>{account.employeeId}</td>
-                                    <td>{account.role}</td>
-                                    <td>
-                                        <button onClick={() => handleEdit(account.id)}>编辑</button>
-                                        <button onClick={() => handleDeleteAccount(account.id)}>删除</button>
-                                    </td>
+                            {accounts.length > 0 ? (
+                                accounts.map((account, index) => (
+                                    <tr key={account.id}>
+                                        <td className="record-number">{start + index}</td>
+                                        <td>{account.id}</td>
+                                        <td>{account.account}</td>
+                                        <td>{account.employeeId}</td>
+                                        <td>{account.role}</td>
+                                        <td>
+                                            <button onClick={() => handleEdit(account.id)}>编辑</button>
+                                            <button onClick={() => handleDeleteAccount(account.id)}>删除</button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="6" className="no-data">暂无账户记录。</td>
                                 </tr>
-                            ))}
+                            )}
                             </tbody>
                         </table>
                     </div>
-                    <div className="pagination">
-                        {[...Array(totalPages)].map((_, index) => (
-                            <button
-                                key={index}
-                                onClick={() => handlePageChange(index + 1)}
-                                className={index + 1 === currentPage ? 'active' : ''}
-                            >
-                                {index + 1}
-                            </button>
-                        ))}
-                    </div>
+                    
+                    {/* 使用通用分页组件 */}
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        totalRecords={totalRecords}
+                        pageSize={pageSize}
+                        onPageChange={handlePageChange}
+                        onPageSizeChange={handlePageSizeChange}
+                        showPageSizeSelector={true}
+                        showJumpToPage={true}
+                        showRecordInfo={true}
+                        pageSizeOptions={[5, 10, 20, 50]}
+                    />
                 </>
             )}
 

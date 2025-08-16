@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getAttendanceRecords, signIn, signOut, requestLeave, approveLeave, getPendingLeaveRequests } from '../services/attendanceService';
+import Pagination from '../components/Pagination';
 import './AttendancePage.css';
 
 const AttendancePage = () => {
@@ -9,20 +10,40 @@ const AttendancePage = () => {
   const [filter, setFilter] = useState({ employeeId: '', date: '' });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
     fetchAttendance();
-  }, [filter, currentPage]);
+  }, [filter, currentPage, pageSize]);
 
   const fetchAttendance = async () => {
     setIsLoading(true);
     try {
-      const data = await getAttendanceRecords(filter, currentPage);
+      console.log('Fetching attendance with params:', { filter, currentPage, pageSize });
+      const data = await getAttendanceRecords(filter, currentPage, pageSize);
+      console.log('Received attendance data:', data);
       setAttendanceRecords(data.records);
-      setTotalPages(data.total);
+      setTotalRecords(data.total);
+      // 计算总页数
+      const calculatedTotalPages = Math.ceil(data.total / pageSize);
+      setTotalPages(calculatedTotalPages);
+      console.log('Calculated pagination:', { 
+        total: data.total, 
+        pageSize, 
+        calculatedTotalPages, 
+        currentPage 
+      });
+      // 如果当前页超出总页数，重置为第一页
+      if (currentPage > calculatedTotalPages && calculatedTotalPages > 0) {
+        setCurrentPage(1);
+      }
     } catch (err) {
+      console.error('Error fetching attendance:', err);
       setError('加载考勤记录失败，请稍后再试。');
       setAttendanceRecords([]);
+      setTotalPages(1);
+      setTotalRecords(0);
     } finally {
       setIsLoading(false);
     }
@@ -30,6 +51,11 @@ const AttendancePage = () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (newPageSize) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1); // 重置到第一页
   };
 
   const handleAttendanceAction = async (action) => {
@@ -68,16 +94,38 @@ const AttendancePage = () => {
   const handleShowPendingLeaves = async () => {
     setIsLoading(true);
     try {
-      const data = await getPendingLeaveRequests();
-      setAttendanceRecords(data);
-      setTotalPages(1);
+      // 使用分页参数获取待审批请假记录
+      const data = await getPendingLeaveRequests(currentPage, pageSize);
+      if (data && data.records) {
+        // 如果是分页数据
+        setAttendanceRecords(data.records);
+        setTotalRecords(data.total);
+        const calculatedTotalPages = Math.ceil(data.total / pageSize);
+        setTotalPages(calculatedTotalPages);
+      } else {
+        // 如果是普通列表数据（兼容旧版本）
+        setAttendanceRecords(data || []);
+        setTotalRecords(data ? data.length : 0);
+        setTotalPages(1);
+      }
     } catch (err) {
       setError('加载待审批请假记录失败，请稍后再试。');
       setAttendanceRecords([]);
+      setTotalRecords(0);
+      setTotalPages(1);
     } finally {
       setIsLoading(false);
     }
   };
+
+  // 计算当前页的记录序号范围
+  const getRecordRange = () => {
+    const start = (currentPage - 1) * pageSize + 1;
+    const end = Math.min(currentPage * pageSize, totalRecords);
+    return { start, end };
+  };
+
+  const { start, end } = getRecordRange();
 
   return (
     <div className="attendance-page">
@@ -114,8 +162,9 @@ const AttendancePage = () => {
             <table className="attendance-table">
               <thead>
                 <tr>
+                  <th width="60">序号</th>
                   <th>员工ID</th>
-                  <th></th>{/*员工姓名*/}
+                  <th>员工姓名</th>
                   <th>时间</th>
                   <th>操作</th>
                   <th>状态</th>
@@ -123,40 +172,44 @@ const AttendancePage = () => {
                 </tr>
               </thead>
               <tbody>
-                {attendanceRecords.map((record) => (
-                  <tr key={record.id}>
-                    <td>{record.employeeId}</td>
-                    <td>{record.employeeName}</td>
-                    <td>{record.time}</td>
-                    <td>{record.action}</td>
-                    <td>{record.status}</td>
-                    <td>
-                      {record.status === '请假待审批' && (
-                        <button onClick={() => handleApproveLeave(record.id)}>审批</button>
-                      )}
-                    </td>
+                {attendanceRecords.length > 0 ? (
+                  attendanceRecords.map((record, index) => (
+                    <tr key={record.id}>
+                      <td className="record-number">{start + index}</td>
+                      <td>{record.employeeId}</td>
+                      <td>{record.employeeName}</td>
+                      <td>{record.time}</td>
+                      <td>{record.action}</td>
+                      <td>{record.status}</td>
+                      <td>
+                        {record.status === '请假待审批' && (
+                          <button onClick={() => handleApproveLeave(record.id)}>审批</button>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="7" className="no-data">暂无考勤记录。</td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
-          <div className="pagination">
-            <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
-              &larr;
-            </button>
-            {[...Array(totalPages)].map((_, index) => (
-              <button
-                key={index}
-                onClick={() => handlePageChange(index + 1)}
-                className={index + 1 === currentPage ? 'active' : ''}
-              >
-                {index + 1}
-              </button>
-            ))}
-            <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
-              &rarr;
-            </button>
-          </div>
+          
+          {/* 使用通用分页组件 */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalRecords={totalRecords}
+            pageSize={pageSize}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            showPageSizeSelector={true}
+            showJumpToPage={true}
+            showRecordInfo={true}
+            pageSizeOptions={[5, 10, 20, 50]}
+          />
         </>
       )}
     </div>

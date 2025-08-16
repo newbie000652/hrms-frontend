@@ -4,6 +4,7 @@ import './EmployeePage.css';
 import Modal from '../components/Modal';
 import EmployeeForm from '../components/Form/EmployeeForm';
 import EmployeeDetails from '../components/EmployeeDetails';
+import Pagination from '../components/Pagination';
 
 const EmployeePage = () => {
   const [employees, setEmployees] = useState([]);
@@ -15,16 +16,29 @@ const EmployeePage = () => {
   const [viewingEmployee, setViewingEmployee] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState({ employeeId: '', employeeName: '', level: '', department: '' });
 
   const fetchEmployees = async () => {
     try {
-      const data = await getEmployees(currentPage, search);
+      const data = await getEmployees(currentPage, search, pageSize);
+      
       setEmployees(data.records);
-      setTotalPages(data.total);
+      setTotalRecords(data.total);
+      // 计算总页数
+      const calculatedTotalPages = Math.ceil(data.total / pageSize);
+      setTotalPages(calculatedTotalPages);
+      
+      // 如果当前页超出总页数，重置为第一页
+      if (currentPage > calculatedTotalPages && calculatedTotalPages > 0) {
+        setCurrentPage(1);
+      }
     } catch (err) {
       setError('加载员工信息失败，请稍后重试。');
       setEmployees([]);
+      setTotalPages(1);
+      setTotalRecords(0);
     } finally {
       setIsLoading(false);
     }
@@ -33,7 +47,7 @@ const EmployeePage = () => {
   // useEffect 中调用
   useEffect(() => {
     fetchEmployees();
-  }, [currentPage, search]);
+  }, [currentPage, pageSize, search]);
 
   // 在需要调用 fetchEmployees 的地方直接使用
   const handleSaveEmployee = async (formData) => {
@@ -55,11 +69,16 @@ const EmployeePage = () => {
     }
   };
 
-
   const handleDeleteEmployee = async (id) => {
     try {
       await markEmployeeAsInactive(id);
       setEmployees((prev) => prev.filter((emp) => emp.id !== id));
+      // 如果当前页没有数据了，且不是第一页，则跳转到上一页
+      if (employees.length === 1 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      } else {
+        await fetchEmployees(); // 重新加载当前页数据
+      }
     } catch (err) {
       setError('删除员工失败，请稍后重试。');
     }
@@ -93,6 +112,11 @@ const EmployeePage = () => {
     setCurrentPage(page);
   };
 
+  const handlePageSizeChange = (newPageSize) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1); // 重置到第一页
+  };
+
   const handleSearchChange = (e) => {
     const { name, value, type } = e.target;
     const formattedValue =
@@ -108,6 +132,15 @@ const EmployeePage = () => {
     setModalOpen(false);
     setEditingEmployee(null);
   };
+
+  // 计算当前页的记录序号范围
+  const getRecordRange = () => {
+    const start = (currentPage - 1) * pageSize + 1;
+    const end = Math.min(currentPage * pageSize, totalRecords);
+    return { start, end };
+  };
+
+  const { start, end } = getRecordRange();
 
   return (
     <div className="employee-page">
@@ -151,10 +184,12 @@ const EmployeePage = () => {
           <div className="add-button-container">
             <button className="add-button" onClick={handleAdd}>新增员工</button>
           </div>
+          
           <div className="table-container">
             <table className="employee-table">
               <thead>
                 <tr>
+                  <th width="60">序号</th>
                   <th>编号</th>
                   <th>姓名</th>
                   <th>级别</th>
@@ -164,8 +199,9 @@ const EmployeePage = () => {
               </thead>
               <tbody>
                 {Array.isArray(employees) && employees.length > 0 ? (
-                  employees.map((employee) => (
+                  employees.map((employee, index) => (
                     <tr key={employee.id}>
+                      <td className="record-number">{start + index}</td>
                       <td>{employee.id}</td>
                       <td>{employee.name}</td>
                       <td>{employee.levelId}</td>
@@ -179,35 +215,26 @@ const EmployeePage = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="5" className="no-data">暂无员工数据。</td>
+                    <td colSpan="6" className="no-data">暂无员工数据。</td>
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
-          <div className="pagination">
-            <button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-            >
-              &lt;
-            </button>
-            {Array.from({ length: totalPages }, (_, index) => (
-              <button
-                key={index + 1}
-                className={currentPage === index + 1 ? 'active' : ''}
-                onClick={() => handlePageChange(index + 1)}
-              >
-                {index + 1}
-              </button>
-            ))}
-            <button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-            >
-              &gt;
-            </button>
-          </div>
+          
+          {/* 使用通用分页组件 */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalRecords={totalRecords}
+            pageSize={pageSize}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            showPageSizeSelector={true}
+            showJumpToPage={true}
+            showRecordInfo={true}
+            pageSizeOptions={[5, 10, 20, 50]}
+          />
         </>
       )}
 

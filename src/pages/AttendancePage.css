@@ -123,6 +123,14 @@
   background-color: var(--background-color-secondary);
 }
 
+/* 序号列样式 */
+.record-number {
+  text-align: center !important;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-color-muted);
+  background-color: var(--background-color-secondary);
+}
+
 .attendance-table .action-buttons {
   display: flex;
   gap: var(--spacing-xs);

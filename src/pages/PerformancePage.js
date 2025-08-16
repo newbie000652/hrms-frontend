@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getPerformanceRecords, createPerformanceRecord, updatePerformanceRecord } from '../services/performanceService';
 import Modal from '../components/Modal';
+import Pagination from '../components/Pagination';
 import './PerformancePage.css';
 
 const PerformancePage = () => {
@@ -11,23 +12,28 @@ const PerformancePage = () => {
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [totalRecords, setTotalRecords] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
     const [search, setSearch] = useState({ searchBy: '', keyword: '' });
 
     useEffect(() => {
         const fetchPerformanceData = async () => {
             try {
-                const data = await getPerformanceRecords(currentPage, 10, search.searchBy, search.keyword);
+                const data = await getPerformanceRecords(currentPage, pageSize, search.searchBy, search.keyword);
                 setPerformanceData(data.records);
-                setTotalPages(data.total);
+                setTotalPages(data.pages || Math.ceil(data.total / pageSize));
+                setTotalRecords(data.total);
             } catch (err) {
                 setError('加载绩效数据失败');
                 setPerformanceData([]);
+                setTotalPages(1);
+                setTotalRecords(0);
             } finally {
                 setIsLoading(false);
             }
         };
         fetchPerformanceData();
-    }, [currentPage, search]);
+    }, [currentPage, pageSize, search]);
 
     const handleSavePerformance = async (performance) => {
         try {
@@ -56,6 +62,11 @@ const PerformancePage = () => {
         setCurrentPage(page);
     };
 
+    const handlePageSizeChange = (newPageSize) => {
+        setPageSize(newPageSize);
+        setCurrentPage(1); // 重置到第一页
+    };
+
     const handleSearchChange = (e) => {
         setSearch({ ...search, [e.target.name]: e.target.value });
     };
@@ -63,6 +74,15 @@ const PerformancePage = () => {
     const handleSearch = () => {
         setCurrentPage(1);
     };
+
+    // 计算当前页的记录序号范围
+    const getRecordRange = () => {
+        const start = (currentPage - 1) * pageSize + 1;
+        const end = Math.min(currentPage * pageSize, totalRecords);
+        return { start, end };
+    };
+
+    const { start, end } = getRecordRange();
 
     return (
         <div className="performance-page">
@@ -93,6 +113,7 @@ const PerformancePage = () => {
                         <table className="performance-table">
                             <thead>
                                 <tr>
+                                    <th width="60">序号</th>
                                     <th>员工ID</th>
                                     <th>评分</th>
                                     <th>评审日期</th>
@@ -101,37 +122,41 @@ const PerformancePage = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {performanceData.map((performance) => (
-                                    <tr key={performance.id}>
-                                        <td>{performance.employeeId}</td>
-                                        <td>{performance.score}</td>
-                                        <td>{performance.reviewDate}</td>
-                                        <td>{performance.remark}</td>
-                                        <td>
-                                            <button onClick={() => handleEdit(performance)}>编辑</button>
-                                        </td>
+                                {performanceData.length > 0 ? (
+                                    performanceData.map((performance, index) => (
+                                        <tr key={performance.id}>
+                                            <td className="record-number">{start + index}</td>
+                                            <td>{performance.employeeId}</td>
+                                            <td>{performance.score}</td>
+                                            <td>{performance.reviewDate}</td>
+                                            <td>{performance.remark}</td>
+                                            <td>
+                                                <button onClick={() => handleEdit(performance)}>编辑</button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="6" className="no-data">暂无绩效记录。</td>
                                     </tr>
-                                ))}
+                                )}
                             </tbody>
                         </table>
                     </div>
-                    <div className="pagination">
-                        <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
-                            &larr;
-                        </button>
-                        {[...Array(totalPages)].map((_, index) => (
-                            <button
-                                key={index}
-                                onClick={() => handlePageChange(index + 1)}
-                                className={index + 1 === currentPage ? 'active' : ''}
-                            >
-                                {index + 1}
-                            </button>
-                        ))}
-                        <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
-                            &rarr;
-                        </button>
-                    </div>
+                    
+                    {/* 使用通用分页组件 */}
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        totalRecords={totalRecords}
+                        pageSize={pageSize}
+                        onPageChange={handlePageChange}
+                        onPageSizeChange={handlePageSizeChange}
+                        showPageSizeSelector={true}
+                        showJumpToPage={true}
+                        showRecordInfo={true}
+                        pageSizeOptions={[5, 10, 20, 50]}
+                    />
                 </>
             )}
 

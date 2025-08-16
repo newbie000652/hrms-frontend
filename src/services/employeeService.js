@@ -9,11 +9,11 @@ const filterParams = (params) => {
 };
 
 // 获取员工列表
-export const getEmployees = async (page = 1, search = {}) => {
+export const getEmployees = async (page = 1, search = {}, pageSize = 10) => {
   try {
     const filteredParams = filterParams({
       page,
-      size: search.size || 10,
+      size: pageSize,
       id: search.employeeId || undefined,
       name: search.employeeName || undefined,
       levelId: search.level || undefined,
@@ -25,6 +25,7 @@ export const getEmployees = async (page = 1, search = {}) => {
     });
 
     const data = response.data.data || { records: [], total: 0 };
+    
     return {
       records: data.records,
       total: data.total
