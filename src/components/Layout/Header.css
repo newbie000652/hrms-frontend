@@ -1,38 +1,116 @@
 /* Header.css */
+@import '../../assets/styles/variables.css';
+
 .header {
-  position: fixed;
-  top: 0;
-  left: 0%;
-  width: 97.7%;
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
-  background-color: var(--primary-color);
-  padding: 0.5rem 1rem;
-  color: white;
-  font-size: 1.2rem;
-  font-weight: bold;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.header a {
-  color: white;
-  text-decoration: none;
-  margin-left: 1rem;
-  transition: color 0.3s;
-}
-
-.header a:hover {
-  color: var(--primary-color-hover);
+  padding: var(--spacing-md) var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-color-hover));
+  color: var(--text-color-light);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  box-shadow: var(--shadow-md);
+  position: relative;
+  z-index: var(--z-fixed);
+  box-sizing: border-box;
 }
 
 .header .logo {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-color-light);
+  text-decoration: none;
+  white-space: nowrap;
 }
 
 .header .nav-links {
   display: flex;
-  gap: 1rem;
+  gap: var(--spacing-md);
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.header a {
+  color: var(--text-color-light);
+  text-decoration: none;
+  transition: all var(--transition-normal);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-sm);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+.header a:hover {
+  color: var(--text-color-light);
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.header .logout-btn {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: var(--text-color-light);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+.header .logout-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .header {
+    padding: var(--spacing-sm) var(--spacing-md);
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+  
+  .header .logo {
+    font-size: var(--font-size-xl);
+  }
+  
+  .header .nav-links {
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+  }
+  
+  .header a {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-sm);
+  }
+  
+  .header .logout-btn {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: var(--spacing-sm);
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    text-align: center;
+  }
+  
+  .header .nav-links {
+    gap: var(--spacing-xs);
+    justify-content: center;
+  }
+  
+  .header a,
+  .header .logout-btn {
+    padding: var(--spacing-xs);
+    font-size: var(--font-size-xs);
+  }
 }

@@ -31,36 +31,38 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="login-container">
-      <h1>登录系统</h1>
-      <form className="login-form" onSubmit={handleLogin}>
-        <div>
-          <label htmlFor="username">用户名</label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="请输入用户名"
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="password">密码</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="请输入密码"
-            required
-          />
-        </div>
-        {error && <p className="error-message">{error}</p>}
-        <button type="submit">登录</button>
-      </form>
+    <div className="login-page">
+      <div className="login-container">
+        <h1>登录系统</h1>
+        <form className="login-form" onSubmit={handleLogin}>
+          <div>
+            <label htmlFor="username">用户名</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="请输入用户名"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="password">密码</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="请输入密码"
+              required
+            />
+          </div>
+          {error && <p className="error-message">{error}</p>}
+          <button type="submit">登录</button>
+        </form>
+      </div>
     </div>
   );
 };

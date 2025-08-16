@@ -1,90 +1,226 @@
 /* src/pages/ResignationPage.css */
+@import '../assets/styles/variables.css';
+
 .resignation-page {
-  position: absolute;
-  top: 60px;
-  left: 0;
   width: 100%;
-  height: calc(100% - 60px);
-  padding: 20px;
+  max-width: 100%;
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
   box-sizing: border-box;
-  background-color: #f9f9f9;
+}
+
+.resignation-page h1 {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-xl);
+  color: var(--text-color);
+  text-align: center;
 }
 
 .search-container {
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background: var(--background-color-light);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color-light);
+  width: 100%;
+  box-sizing: border-box;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .search-container input {
-  padding: 10px;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: var(--spacing-md);
+  font-size: var(--font-size-base);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
+  min-width: 200px;
+  flex: 1;
+  box-sizing: border-box;
+}
+
+.search-container input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-color-light);
+  outline: none;
 }
 
 .search-container button {
-  padding: 10px 20px;
-  font-size: 1rem;
-  color: white;
-  background-color: #0078d4;
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: var(--font-size-base);
+  color: var(--text-color-light);
+  background-color: var(--primary-color);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius-md);
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all var(--transition-normal);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .search-container button:hover {
-  background-color: #005ea6;
+  background-color: var(--primary-color-hover);
+  transform: translateY(-1px);
 }
 
 .table-container {
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-lg);
+  background: var(--background-color-light);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color-light);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .employee-table {
   width: 100%;
   border-collapse: collapse;
+  margin: 0;
 }
 
 .employee-table th,
 .employee-table td {
-  padding: 10px;
+  padding: var(--spacing-md);
   text-align: left;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--border-color-light);
 }
 
 .employee-table th {
-  background-color: #f2f2f2;
+  background-color: var(--background-color-secondary);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-color-secondary);
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.employee-table td {
+  font-size: var(--font-size-base);
+  color: var(--text-color-secondary);
+}
+
+.employee-table tr:hover {
+  background-color: var(--background-color-secondary);
 }
 
 .pagination {
   display: flex;
   justify-content: center;
-  margin-top: 20px;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-lg);
+  width: 100%;
 }
 
 .pagination button {
-  margin: 0 5px;
-  padding: 5px 10px;
-  border: 1px solid #ccc;
-  background-color: #fff;
+  margin: 0;
+  padding: var(--spacing-md);
+  border: 1px solid var(--border-color);
+  background-color: var(--background-color-light);
+  color: var(--text-color-secondary);
   cursor: pointer;
-  font-size: 1rem;
-}
-
-.pagination button.active {
-  background-color: #0078d4;
-  color: white;
-  border-color: #0078d4;
+  font-size: var(--font-size-sm);
+  border-radius: var(--border-radius-md);
+  min-width: 45px;
+  transition: all var(--transition-normal);
 }
 
 .pagination button:hover {
-  background-color: #ddd;
+  background-color: var(--background-color-secondary);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.pagination button.active {
+  background-color: var(--primary-color);
+  color: var(--text-color-light);
+  border-color: var(--primary-color);
 }
 
 .no-data {
   text-align: center;
-  font-size: 1.2rem;
-  color: #888;
+  font-size: var(--font-size-lg);
+  color: var(--text-color-secondary);
+  padding: var(--spacing-xxl) var(--spacing-md);
+  background-color: var(--background-color-secondary);
+  border-radius: var(--border-radius-lg);
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+  .search-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-container input {
+    min-width: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .resignation-page h1 {
+    font-size: var(--font-size-3xl);
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .search-container {
+    padding: var(--spacing-md);
+    gap: var(--spacing-sm);
+  }
+  
+  .search-container input {
+    padding: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+  }
+  
+  .search-container button {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-sm);
+  }
+  
+  .employee-table th,
+  .employee-table td {
+    padding: var(--spacing-md) var(--spacing-sm);
+    font-size: var(--font-size-sm);
+  }
+  
+  .pagination button {
+    padding: var(--spacing-sm);
+    min-width: 40px;
+    font-size: var(--font-size-xs);
+  }
+}
+
+@media (max-width: 480px) {
+  .resignation-page h1 {
+    font-size: var(--font-size-2xl);
+  }
+  
+  .search-container {
+    padding: var(--spacing-sm);
+  }
+  
+  .search-container button {
+    width: 100%;
+    padding: var(--spacing-md);
+  }
+  
+  .employee-table th,
+  .employee-table td {
+    padding: var(--spacing-sm) var(--spacing-xs);
+    font-size: var(--font-size-xs);
+  }
+  
+  .pagination button {
+    min-width: 35px;
+    font-size: var(--font-size-xs);
+  }
 }

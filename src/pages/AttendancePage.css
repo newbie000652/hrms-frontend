@@ -1,109 +1,285 @@
 /* src/pages/AttendancePage.css */
+@import '../assets/styles/variables.css';
+
 .attendance-page {
-  position: absolute;
-  top: 60px;
-  left: 0;
   width: 100%;
-  height: calc(100% - 60px);
-  padding: 20px;
+  max-width: 100%;
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
   box-sizing: border-box;
-  background-color: #f9f9f9;
+}
+
+.attendance-page h1 {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-xl);
+  color: var(--text-color);
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .filter-container {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 20px;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background: var(--background-color-light);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color-light);
+  width: 100%;
+  box-sizing: border-box;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
 }
 
 .filter-container select,
 .filter-container input {
-  padding: 8px;
-  font-size: 1rem;
-  max-width: 220px;
+  padding: var(--spacing-md);
+  font-size: var(--font-size-base);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
+  min-width: 200px;
+  max-width: 250px;
+  box-sizing: border-box;
+}
+
+.filter-container select:focus,
+.filter-container input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-color-light);
+  outline: none;
 }
 
 .button-group {
   display: flex;
-  gap: 5px;
-  /* 设置按钮间距 */
+  gap: var(--spacing-sm);
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .filter-container button {
-  padding: 12px 24px;
-  /* 调整按钮大小 */
-  background-color: #0078d4;
-  color: white;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background-color: var(--primary-color);
+  color: var(--text-color-light);
   border: none;
+  border-radius: var(--border-radius-md);
   cursor: pointer;
-  font-size: 1.1rem;
-  /* 增大按钮文字大小 */
+  transition: all var(--transition-normal);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 
 .filter-container button:hover {
-  background-color: #005bb5;
+  background-color: var(--primary-color-hover);
+  transform: translateY(-1px);
 }
 
 .filter-container button:active {
-  background-color: #004494;
+  background-color: var(--primary-color-dark);
 }
 
 .attendance-table {
   width: 100%;
   border-collapse: collapse;
+  background: var(--background-color-light);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color-light);
+  margin-bottom: var(--spacing-lg);
+  box-sizing: border-box;
 }
 
-.attendance-table th,
+.attendance-table th, 
 .attendance-table td {
-  padding: 10px;
+  padding: var(--spacing-md);
   text-align: left;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--border-color-light);
+  box-sizing: border-box;
 }
 
 .attendance-table th {
-  background-color: #f2f2f2;
+  background-color: var(--background-color-secondary);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-color-secondary);
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.attendance-table td {
+  font-size: var(--font-size-base);
+  color: var(--text-color-secondary);
+}
+
+.attendance-table tr:hover {
+  background-color: var(--background-color-secondary);
+}
+
+.attendance-table .action-buttons {
+  display: flex;
+  gap: var(--spacing-xs);
+  align-items: center;
 }
 
 .attendance-table .action-buttons button {
-  margin: 0 5px;
+  margin: 0;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-sm);
+  color: var(--text-color-light);
+  background-color: var(--primary-color);
+  border: none;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  font-weight: var(--font-weight-medium);
+  box-sizing: border-box;
+}
+
+.attendance-table .action-buttons button:hover {
+  background-color: var(--primary-color-hover);
+  transform: translateY(-1px);
 }
 
 .pagination {
-  margin: 10px 0;
   display: flex;
   justify-content: center;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-xl);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .pagination button {
-  margin: 0 5px;
-  padding: 10px;
-  width: 40px;
-  height: 40px;
-  border: 1px solid #ccc;
-  background-color: #0078d4 !important;
+  margin: 0;
+  padding: var(--spacing-md);
+  border: 1px solid var(--border-color);
+  background-color: var(--background-color-light);
+  color: var(--text-color-secondary);
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all var(--transition-normal);
+  font-size: var(--font-size-sm);
+  border-radius: var(--border-radius-md);
+  min-width: 45px;
+  box-sizing: border-box;
 }
 
 .pagination button:hover {
-  background-color: #005bb5 !important;
-}
-
-.pagination button:active {
-  background-color: #004494 !important;
-  color: #fff;
-  border-color: #004494 !important;
+  background-color: var(--background-color-secondary);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
 }
 
 .pagination button.active {
-  background-color: #004494 !important;
-  color: #fff;
-  border-color: #004494 !important;
+  background-color: var(--primary-color);
+  color: var(--text-color-light);
+  border-color: var(--primary-color);
 }
 
-.attendance-table-container {
-  max-height: 60vh;
-  /* 根据需要调整高度 */
-  overflow-y: auto;
-  margin-bottom: 20px;
+.pagination button:disabled {
+  background-color: var(--background-color-secondary);
+  color: var(--text-color-muted);
+  cursor: not-allowed;
+  border-color: var(--border-color-light);
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+  .filter-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filter-container select,
+  .filter-container input {
+    min-width: auto;
+    max-width: none;
+  }
+  
+  .button-group {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .attendance-page h1 {
+    font-size: var(--font-size-3xl);
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .filter-container {
+    padding: var(--spacing-md);
+    gap: var(--spacing-sm);
+  }
+  
+  .filter-container select,
+  .filter-container input {
+    padding: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+  }
+  
+  .filter-container button {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-sm);
+  }
+  
+  .attendance-table th, 
+  .attendance-table td {
+    padding: var(--spacing-md) var(--spacing-sm);
+    font-size: var(--font-size-sm);
+  }
+  
+  .attendance-table .action-buttons button {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
+    margin: var(--spacing-xs);
+  }
+  
+  .pagination button {
+    padding: var(--spacing-sm);
+    font-size: var(--font-size-xs);
+    min-width: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .attendance-page h1 {
+    font-size: var(--font-size-2xl);
+  }
+  
+  .filter-container {
+    padding: var(--spacing-sm);
+  }
+  
+  .filter-container button {
+    width: 100%;
+    padding: var(--spacing-md);
+  }
+  
+  .attendance-table th, 
+  .attendance-table td {
+    padding: var(--spacing-sm) var(--spacing-xs);
+    font-size: var(--font-size-xs);
+  }
+  
+  .attendance-table .action-buttons button {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
+    margin: var(--spacing-xs);
+  }
+  
+  .pagination button {
+    width: 35px;
+    height: 35px;
+    min-width: 35px;
+    font-size: var(--font-size-xs);
+  }
 }

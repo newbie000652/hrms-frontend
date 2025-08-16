@@ -1,25 +1,73 @@
 /* Footer.css */
+@import '../../assets/styles/variables.css';
+
 .footer {
-    background-color: var(--primary-color);
-    color: white;
-    text-align: center;
-    padding: 0.2rem 0;
-    font-size: 0.9rem;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-color-hover));
+  color: var(--text-color-light);
+  text-align: center;
+  padding: var(--spacing-md) 0;
+  font-size: var(--font-size-sm);
+  position: relative;
+  box-shadow: var(--shadow-md);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.footer p {
+  margin: 0;
+  padding: 0 var(--spacing-md);
+  line-height: var(--line-height-normal);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.footer a {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  margin: 0 var(--spacing-sm);
+  transition: all var(--transition-normal);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  display: inline-block;
+}
+
+.footer a:hover {
+  color: var(--text-color-light);
+  background-color: rgba(255, 255, 255, 0.1);
+  text-decoration: none;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .footer {
+    padding: var(--spacing-sm) 0;
+    font-size: var(--font-size-xs);
+  }
+  
+  .footer p {
+    padding: 0 var(--spacing-sm);
   }
   
   .footer a {
-    color: white;
-    text-decoration: underline;
-    margin: 0 0.5rem;
-    transition: color 0.3s;
+    margin: 0 var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  .footer {
+    padding: var(--spacing-sm) 0;
+    font-size: var(--font-size-xs);
   }
   
-  .footer a:hover {
-    color: var(--primary-color-hover);
+  .footer p {
+    padding: 0 var(--spacing-xs);
   }
+  
+  .footer a {
+    display: block;
+    margin: var(--spacing-xs) 0;
+    padding: var(--spacing-xs);
+  }
+}
   

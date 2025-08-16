@@ -1,152 +1,225 @@
 /* src/pages/AccountPage.css */
+@import '../assets/styles/variables.css';
 
 .account-page {
-    position: absolute;
-    top: 60px;
-    left: 0;
-    width: 100%;
-    height: calc(100% - 60px);
-    padding: 20px;
-    box-sizing: border-box;
-    background-color: #f9f9f9;
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+  box-sizing: border-box;
 }
 
 .account-page h1 {
-    font-size: 2em;
-    font-weight: bold;
-    margin-bottom: 20px;
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-xl);
+  color: var(--text-color);
+  text-align: center;
 }
 
 .error-message {
-    color: red;
-    margin-bottom: 20px;
+  color: var(--error-color);
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background-color: var(--error-color-light);
+  border-radius: var(--border-radius-md);
+  border-left: 4px solid var(--error-color);
 }
 
 .action-container {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+  display: flex;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background: var(--background-color-light);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color-light);
+  width: 100%;
+  box-sizing: border-box;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .action-container input {
-    padding: 20px;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    height: 66px;
-    flex: 1;
-    /* Allow input to take remaining space */
+  padding: var(--spacing-lg);
+  font-size: var(--font-size-base);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  height: 66px;
+  flex: 1;
+  min-width: 200px;
+  transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
+  box-sizing: border-box;
+}
+
+.action-container input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-color-light);
+  outline: none;
 }
 
 .action-container button {
-    padding: 20px 20px;
-    font-size: 1rem;
-    color: white;
-    background-color: #0078d4;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    height: 66px;
-    width: 150px;
-    /* Increase the width of the button */
+  padding: var(--spacing-lg);
+  font-size: var(--font-size-base);
+  color: var(--text-color-light);
+  background-color: var(--primary-color);
+  border: none;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  height: 66px;
+  width: 150px;
+  font-weight: var(--font-weight-medium);
+  flex-shrink: 0;
 }
 
 .action-container button:hover {
-    background-color: #005ea6;
+  background-color: var(--primary-color-hover);
+  transform: translateY(-1px);
 }
 
 .account-table-container {
-    max-height: 60vh;
-    overflow-y: auto;
-    margin-bottom: 20px;
+  background: var(--background-color-light);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color-light);
+  margin-bottom: var(--spacing-lg);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .account-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
 }
 
 .account-table th,
 .account-table td {
-    padding: 10px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
+  padding: var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid var(--border-color-light);
 }
 
 .account-table th {
-    background-color: #f2f2f2;
+  background-color: var(--background-color-secondary);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-color-secondary);
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .account-table td {
-    font-size: 1rem;
+  font-size: var(--font-size-base);
+  color: var(--text-color-secondary);
+}
+
+.account-table tr:hover {
+  background-color: var(--background-color-secondary);
 }
 
 .account-table td button {
-    padding: 5px 10px;
-    margin: 0 5px;
-    font-size: 1rem;
-    color: white;
-    background-color: #0078d4;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.1s;
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin: 0 var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--text-color-light);
+  background-color: var(--primary-color);
+  border: none;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  font-weight: var(--font-weight-medium);
 }
 
 .account-table td button:hover {
-    background-color: #005ea6;
+  background-color: var(--primary-color-hover);
+  transform: translateY(-1px);
 }
 
-.pagination {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
+/* 响应式设计 */
+@media (max-width: 1024px) {
+  .action-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .action-container input {
+    min-width: auto;
+  }
+  
+  .action-container button {
+    width: 100%;
+  }
 }
 
-.pagination button {
-    margin: 0 5px;
-    padding: 5px 10px;
-    border: 1px solid #ccc;
-    background-color: #fff;
-    cursor: pointer;
-    font-size: 1rem;
+@media (max-width: 768px) {
+  .account-page h1 {
+    font-size: var(--font-size-3xl);
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .action-container {
+    padding: var(--spacing-md);
+    gap: var(--spacing-sm);
+  }
+  
+  .action-container input {
+    padding: var(--spacing-md);
+    height: 56px;
+  }
+  
+  .action-container button {
+    padding: var(--spacing-md);
+    height: 56px;
+    font-size: var(--font-size-sm);
+  }
+  
+  .account-table th,
+  .account-table td {
+    padding: var(--spacing-md) var(--spacing-sm);
+    font-size: var(--font-size-sm);
+  }
+  
+  .account-table td button {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
+    margin: var(--spacing-xs);
+  }
 }
 
-.pagination button.active {
-    background-color: #0078d4;
-    color: white;
-    border-color: #0078d4;
-}
-
-.pagination button:hover {
-    background-color: #ddd;
-}
-
-.no-data {
-    text-align: center;
-    font-size: 1.2rem;
-    color: #888;
-}
-
-.modal-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-}
-
-.modal-buttons button {
-    padding: 10px 20px;
-    font-size: 1rem;
-    color: white;
-    background-color: #0078d4;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.modal-buttons button:hover {
-    background-color: #005ea6;
+@media (max-width: 480px) {
+  .account-page h1 {
+    font-size: var(--font-size-2xl);
+  }
+  
+  .action-container {
+    padding: var(--spacing-sm);
+  }
+  
+  .action-container input {
+    padding: var(--spacing-sm);
+    height: 50px;
+  }
+  
+  .action-container button {
+    padding: var(--spacing-sm);
+    height: 50px;
+    font-size: var(--font-size-sm);
+  }
+  
+  .account-table th,
+  .account-table td {
+    padding: var(--spacing-sm) var(--spacing-xs);
+    font-size: var(--font-size-xs);
+  }
+  
+  .account-table td button {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
+    margin: var(--spacing-xs);
+  }
 }

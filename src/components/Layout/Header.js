@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import './Header.css';
 
 const Header = () => {
@@ -7,6 +7,7 @@ const Header = () => {
 
     const handleLogout = () => {
         // 这里可以添加任何需要的登出逻辑，比如清除用户数据
+        localStorage.removeItem('role');
         navigate('/');
     };
 
@@ -14,9 +15,9 @@ const Header = () => {
         <header className="header">
             <div className="logo">HRMS</div>
             <nav className="nav-links">
-                <a href="/dashboard">Dashboard</a>
-                <a href="/attendance">Attendance</a>
-                <a href="#" onClick={handleLogout}>Logout</a>
+                <Link to="/dashboard">Dashboard</Link>
+                <Link to="/attendance">Attendance</Link>
+                <button onClick={handleLogout} className="logout-btn">Logout</button>
             </nav>
         </header>
     );

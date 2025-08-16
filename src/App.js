@@ -1,3 +1,4 @@
+// App.js
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
@@ -14,97 +15,95 @@ import Footer from "./components/Layout/Footer";
 import Sidebar from "./components/Layout/Sidebar";
 import PrivateRoute from "./components/PrivateRoute";
 import PerformancePage from "./pages/PerformancePage";
-import AccountPage from "./pages/AccountPage"; // 添加这一行
+import AccountPage from "./pages/AccountPage";
 
 const App = () => {
     return (
         <Router>
             <div className="app-container">
                 <Header />
-                <div className="main-layout">
-                    <Sidebar />
-                    <div className="content">
-                        <Routes>
-                            {/* 公共路由 */}
-                            <Route path="/" element={<LoginPage />} />
-                            <Route path="/unauthorized" element={<UnauthorizedPage />} />
+                <Sidebar />
+                <main className="main-content">
+                    <Routes>
+                        {/* 公共路由 */}
+                        <Route path="/" element={<LoginPage />} />
+                        <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-                            {/* 受保护路由 */}
-                            <Route
-                                path="/dashboard"
-                                element={
-                                    <PrivateRoute>
-                                        <DashboardPage />
-                                    </PrivateRoute>
-                                }
-                            />
-                            <Route
-                                path="/employees"
-                                element={
-                                    <PrivateRoute>
-                                        <EmployeePage />
-                                    </PrivateRoute>
-                                }
-                            />
-                            <Route
-                                path="/attendance"
-                                element={
-                                    <PrivateRoute>
-                                        <AttendancePage />
-                                    </PrivateRoute>
-                                }
-                            />
-                            <Route
-                                path="/salary"
-                                element={
-                                    <PrivateRoute>
-                                        <SalaryPage />
-                                    </PrivateRoute>
-                                }
-                            />
-                            <Route
-                                path="/resignation"
-                                element={
-                                    <PrivateRoute>
-                                        <ResignationPage />
-                                    </PrivateRoute>
-                                }
-                            />
-                            <Route
-                                path="/accounts"
-                                element={
-                                    <PrivateRoute>
-                                        <AccountPage />
-                                    </PrivateRoute>
-                                }
-                            />
-                            <Route
-                                path="/performance"
-                                element={
-                                    <PrivateRoute>
-                                        <PerformancePage />
-                                    </PrivateRoute>
-                                }
-                            />
-                            <Route
-                                path="/logs"
-                                element={
-                                    <PrivateRoute>
-                                        <LogsPage />
-                                    </PrivateRoute>
-                                }
-                            />
-                            <Route
-                                path="/statistics"
-                                element={
-                                    <PrivateRoute>
-                                        <StatisticsPage />
-                                    </PrivateRoute>
-                                }
-                            />
-                        </Routes>
-                    </div>
-                </div>
+                        {/* 受保护路由 */}
+                        <Route
+                            path="/dashboard"
+                            element={
+                                <PrivateRoute>
+                                    <DashboardPage />
+                                </PrivateRoute>
+                            }
+                        />
+                        <Route
+                            path="/employees"
+                            element={
+                                <PrivateRoute>
+                                    <EmployeePage />
+                                </PrivateRoute>
+                            }
+                        />
+                        <Route
+                            path="/attendance"
+                            element={
+                                <PrivateRoute>
+                                    <AttendancePage />
+                                </PrivateRoute>
+                            }
+                        />
+                        <Route
+                            path="/salary"
+                            element={
+                                <PrivateRoute>
+                                    <SalaryPage />
+                                </PrivateRoute>
+                            }
+                        />
+                        <Route
+                            path="/resignation"
+                            element={
+                                <PrivateRoute>
+                                    <ResignationPage />
+                                </PrivateRoute>
+                            }
+                        />
+                        <Route
+                            path="/accounts"
+                            element={
+                                <PrivateRoute>
+                                    <AccountPage />
+                                </PrivateRoute>
+                            }
+                        />
+                        <Route
+                            path="/performance"
+                            element={
+                                <PrivateRoute>
+                                    <PerformancePage />
+                                </PrivateRoute>
+                            }
+                        />
+                        <Route
+                            path="/logs"
+                            element={
+                                <PrivateRoute>
+                                    <LogsPage />
+                                </PrivateRoute>
+                            }
+                        />
+                        <Route
+                            path="/statistics"
+                            element={
+                                <PrivateRoute>
+                                    <StatisticsPage />
+                                </PrivateRoute>
+                            }
+                        />
+                    </Routes>
+                </main>
                 <Footer />
             </div>
         </Router>
