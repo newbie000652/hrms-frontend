@@ -1,0 +1,64 @@
+.logs-page {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  width: 100%;
+  height: calc(100% - 60px);
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: #f9f9f9;
+}
+
+.logs-page h1 {
+  margin: 0;
+  padding-bottom: 20px;
+  font-size: 2rem;
+  text-align: left;
+}
+
+.logs-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.logs-table th,
+.logs-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.logs-table th {
+  background-color: #f2f2f2;
+}
+
+.logs-page .error-message {
+  color: red;
+  margin-bottom: 20px;
+}
+
+.pagination {
+  margin: 10px 0;
+  display: flex;
+  justify-content: center;
+}
+
+.pagination button {
+  margin: 0 5px;
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.pagination button.active {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+
+.no-data {
+  text-align: center;
+  font-size: 14px;
+  color: #888;
+}

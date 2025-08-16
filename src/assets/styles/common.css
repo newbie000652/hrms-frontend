@@ -1,0 +1,71 @@
+/* common.css */
+:root {
+  --primary-color: #0078d4;
+  /* 微软蓝 */
+  --primary-color-hover: #005a9e;
+  /* 悬浮时更深的蓝色 */
+  --secondary-color: #6c757d;
+  /* 辅助灰色 */
+  --secondary-color-hover: #495057;
+  /* 灰色悬浮时的颜色 */
+  --text-color: #212121;
+  /* 深灰，主要文本 */
+  --background-color: #f3f9ff;
+  /* 背景浅蓝 */
+  --error-color: #d32f2f;
+  /* 错误信息的红色 */
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--primary-color-hover);
+}
+
+button {
+  font-family: inherit;
+  color: white;
+  background-color: var(--primary-color);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.1s;
+}
+
+button:hover {
+  background-color: var(--primary-color-hover);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+input,
+select,
+textarea {
+  font-family: inherit;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 0.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary-color);
+  outline: none;
+  box-shadow: 0 0 4px rgba(0, 120, 212, 0.5);
+}

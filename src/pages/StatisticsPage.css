@@ -1,0 +1,107 @@
+.statistics-page {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  width: 100%;
+  height: calc(100% - 60px);
+  padding: 20px;
+  background-color: #f9f9f9;
+  box-sizing: border-box;
+}
+
+.statistics-page h1 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.statistics-summary {
+  margin-bottom: 30px;
+}
+
+.statistics-summary h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.statistics-summary table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.statistics-summary th,
+.statistics-summary td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.statistics-summary th {
+  background-color: #f2f2f2;
+}
+
+.statistics-summary td {
+  font-size: 1rem;
+}
+
+.no-data-message {
+  font-size: 1.2rem;
+  color: #888;
+  text-align: center;
+  margin-top: 50px;
+}
+
+.charts-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.chart {
+  width: 48%;
+  box-sizing: border-box;
+}
+
+.chart h2 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.chart p {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #888;
+}
+
+.error-message {
+  color: red;
+  font-size: 1.2rem;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.action-container {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.large-button {
+  font-size: 1.5rem;
+  padding: 15px 30px;
+  margin: 10px;
+}
+
+@media (max-width: 768px) {
+  .charts-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .chart {
+    width: 90%;
+  }
+}
