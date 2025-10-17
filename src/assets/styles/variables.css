@@ -43,10 +43,10 @@
   --border-color-dark: #adb5bd;
   
   /* Layout */
-  --header-height: 64px;
-  --sidebar-width: 280px;
-  --content-max-width: 1400px;
-  --container-padding: 24px;
+  --header-height: 56px;
+  --sidebar-width: 220px;
+  --content-max-width: 1280px;
+  --container-padding: 20px;
   
   /* Spacing */
   --spacing-xs: 0.25rem;

@@ -1,8 +1,9 @@
 // src/pages/LogsPage.js
 import React, { useEffect, useState } from 'react';
 import { getLogs } from '../services/logService';
+import PageHeader from '../components/Layout/PageHeader';
+import Table from '../components/Layout/Table';
 import Pagination from '../components/Pagination';
-import './LogsPage.css';
 
 const LogsPage = () => {
   const [logs, setLogs] = useState([]);
@@ -52,46 +53,30 @@ const LogsPage = () => {
 
   const { start, end } = getRecordRange();
 
+  const columns = [
+    { label: '序号', field: 'index', width: '60px', render: (row, index) => start + index },
+    { label: '账户ID', field: 'accountId' },
+    { label: '操作', field: 'action' },
+    { label: '操作对象', field: 'target' },
+    { label: '操作时间', field: 'actionTime' },
+  ];
+
   return (
-    <div className="logs-page">
-      <h1>系统日志</h1>
-      {error && <p className="error-message">{error}</p>}
+    <div className="space-y-5">
+      <PageHeader title="系统日志" />
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+          {error}
+        </div>
+      )}
+
       {isLoading ? (
-        <p>加载中...</p>
+        <div className="text-center py-12 text-gray-500">加载中...</div>
       ) : (
         <>
-          <table className="logs-table">
-            <thead>
-              <tr>
-                <th width="60">序号</th>
-                <th>账户ID</th>
-                <th>操作</th>
-                <th>操作对象</th>
-                <th>操作时间</th>
-              </tr>
-            </thead>
-            <tbody>
-              {logs.length > 0 ? (
-                logs.map((log, index) => (
-                  <tr key={index}>
-                    <td className="record-number">{start + index}</td>
-                    <td>{log.accountId}</td>
-                    <td>{log.action}</td>
-                    <td>{log.target}</td>
-                    <td>{log.actionTime}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5" className="no-data">
-                    暂无日志数据。
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-          
-          {/* 使用通用分页组件 */}
+          <Table columns={columns} data={logs} emptyMessage="暂无日志数据" />
+
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}

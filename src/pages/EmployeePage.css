@@ -9,13 +9,7 @@
   margin: 0;
 }
 
-.employee-page h1 {
-  font-size: var(--font-size-4xl);
-  font-weight: var(--font-weight-bold);
-  margin-bottom: var(--spacing-xl);
-  color: var(--text-color);
-  text-align: center;
-}
+/* 使用 PageHeader 统一页头，移除页面内对 h1 的重置，避免字号过大 */
 
 .error-message {
   color: var(--error-color);
@@ -28,16 +22,20 @@
 
 .search-container {
   background: var(--background-color-light);
-  padding: var(--spacing-lg);
-  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-md);
   box-shadow: var(--shadow-sm);
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: var(--spacing-md);
   border: 1px solid var(--border-color-light);
   width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--spacing-sm);
+  align-items: center;
 }
 
 .search-container input {
-  padding: var(--spacing-md);
+  padding: var(--spacing-sm);
   font-size: var(--font-size-base);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius-md);
@@ -50,13 +48,14 @@
 }
 
 .search-container button {
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
   background-color: var(--primary-color);
   color: var(--text-color-light);
   border: none;
   border-radius: var(--border-radius-md);
   cursor: pointer;
   font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
   transition: all var(--transition-normal);
 }
 
@@ -68,19 +67,19 @@
 .add-button-container {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: var(--spacing-md);
   width: 100%;
 }
 
 .add-button {
-  padding: var(--spacing-md) var(--spacing-xl);
+  padding: var(--spacing-sm) var(--spacing-lg);
   background-color: var(--primary-color);
   color: var(--text-color-light);
   border: none;
   border-radius: var(--border-radius-md);
   cursor: pointer;
   font-weight: var(--font-weight-medium);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
   transition: all var(--transition-normal);
   box-shadow: var(--shadow-sm);
 }
@@ -96,7 +95,7 @@
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
   border: 1px solid var(--border-color-light);
   width: 100%;
 }

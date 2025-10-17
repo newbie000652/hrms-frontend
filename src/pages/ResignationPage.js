@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { getResignations, getResignationDetails } from '../services/resignationService';
+import PageHeader from '../components/Layout/PageHeader';
+import SearchBar from '../components/Layout/SearchBar';
+import Table from '../components/Layout/Table';
+import { PrimaryButton, SecondaryButton } from '../components/Layout/Buttons';
 import Modal from '../components/Modal';
 import Pagination from '../components/Pagination';
-import './ResignationPage.css';
 
 const ResignationPage = () => {
     const [resignations, setResignations] = useState([]);
@@ -77,21 +80,40 @@ const ResignationPage = () => {
 
     const { start, end } = getRecordRange();
 
+    const columns = [
+        { label: '序号', field: 'index', width: '60px', render: (row, index) => start + index },
+        { label: 'ID', field: 'id' },
+        { label: '姓名', field: 'name' },
+        { label: '级别', field: 'levelId' },
+        { label: '部门', field: 'departmentId' },
+    ];
+
+    const actions = [
+        { label: '查看详情', variant: 'primary', onClick: (row) => handleViewDetails(row.id) },
+    ];
+
     return (
-        <div className="resignation-page">
-            <h1>离职管理</h1>
-            {error && <p className="error-message">{error}</p>}
+        <div className="space-y-5">
+            <PageHeader title="离职管理" />
+
+            {error && (
+                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+                    {error}
+                </div>
+            )}
+
             {isLoading ? (
-                <p>加载中...</p>
+                <div className="text-center py-12 text-gray-500">加载中...</div>
             ) : (
                 <>
-                    <div className="search-container">
+                    <SearchBar>
                         <input
                             type="text"
                             name="employeeId"
                             value={search.employeeId}
                             onChange={handleSearchChange}
                             placeholder="员工ID"
+                            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
                         />
                         <input
                             type="text"
@@ -99,6 +121,7 @@ const ResignationPage = () => {
                             value={search.employeeName}
                             onChange={handleSearchChange}
                             placeholder="员工姓名"
+                            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
                         />
                         <input
                             type="text"
@@ -106,6 +129,7 @@ const ResignationPage = () => {
                             value={search.level}
                             onChange={handleSearchChange}
                             placeholder="员工级别"
+                            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
                         />
                         <input
                             type="text"
@@ -113,45 +137,13 @@ const ResignationPage = () => {
                             value={search.department}
                             onChange={handleSearchChange}
                             placeholder="员工部门"
+                            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
                         />
-                        <button onClick={handleSearch}>搜索</button>
-                    </div>
-                    <div className="table-container">
-                        <table className="employee-table">
-                            <thead>
-                                <tr>
-                                    <th width="60">序号</th>
-                                    <th>ID</th>
-                                    <th>姓名</th>
-                                    <th>级别</th>
-                                    <th>部门</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {resignations.length > 0 ? (
-                                    resignations.map((resignation, index) => (
-                                        <tr key={resignation.id}>
-                                            <td className="record-number">{start + index}</td>
-                                            <td>{resignation.id}</td>
-                                            <td>{resignation.name}</td>
-                                            <td>{resignation.levelId}</td>
-                                            <td>{resignation.departmentId}</td>
-                                            <td>
-                                                <button onClick={() => handleViewDetails(resignation.id)}>查看详情</button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan="6" className="no-data">暂无离职数据。</td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    {/* 使用通用分页组件 */}
+                        <PrimaryButton onClick={handleSearch}>搜索</PrimaryButton>
+                    </SearchBar>
+
+                    <Table columns={columns} data={resignations} actions={actions} emptyMessage="暂无离职数据" />
+
                     <Pagination
                         currentPage={currentPage}
                         totalPages={totalPages}
@@ -169,37 +161,51 @@ const ResignationPage = () => {
 
             {modalOpen && (
                 <Modal title="离职详情" onClose={() => setModalOpen(false)}>
-                    <div className="resignation-details">
-                        <h3>基本信息</h3>
-                        <p>编号: {viewingResignation?.id || '未提供'}</p>
-                        <p>姓名: {viewingResignation?.name || '未提供'}</p>
-                        <p>性别: {viewingResignation?.gender || '未提供'}</p>
-                        <p>邮箱: {viewingResignation?.email || '未提供'}</p>
-                        <p>电话: {viewingResignation?.phone || '未提供'}</p>
-                        <p>入职日期: {viewingResignation?.entryDate ? new Date(viewingResignation.entryDate).toLocaleDateString() : '未提供'}</p>
-                        <p>状态: {viewingResignation?.isActive ? '在职' : '离职'}</p>
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">基本信息</h3>
+                            <div className="grid grid-cols-2 gap-2 text-sm">
+                                <p><span className="font-medium text-gray-600">编号:</span> {viewingResignation?.id || '未提供'}</p>
+                                <p><span className="font-medium text-gray-600">姓名:</span> {viewingResignation?.name || '未提供'}</p>
+                                <p><span className="font-medium text-gray-600">性别:</span> {viewingResignation?.gender || '未提供'}</p>
+                                <p><span className="font-medium text-gray-600">邮箱:</span> {viewingResignation?.email || '未提供'}</p>
+                                <p><span className="font-medium text-gray-600">电话:</span> {viewingResignation?.phone || '未提供'}</p>
+                                <p><span className="font-medium text-gray-600">入职日期:</span> {viewingResignation?.entryDate ? new Date(viewingResignation.entryDate).toLocaleDateString() : '未提供'}</p>
+                                <p><span className="font-medium text-gray-600">状态:</span> {viewingResignation?.isActive ? '在职' : '离职'}</p>
+                            </div>
+                        </div>
 
-                        <h3>部门信息</h3>
-                        <p>部门编号: {viewingResignation?.departmentId || '未分配'}</p>
-                        <p>部门名称: {viewingResignation?.departmentName || '未提供'}</p>
+                        <div className="space-y-2">
+                            <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">部门信息</h3>
+                            <div className="grid grid-cols-2 gap-2 text-sm">
+                                <p><span className="font-medium text-gray-600">部门编号:</span> {viewingResignation?.departmentId || '未分配'}</p>
+                                <p><span className="font-medium text-gray-600">部门名称:</span> {viewingResignation?.departmentName || '未提供'}</p>
+                            </div>
+                        </div>
 
-                        <h3>级别信息</h3>
-                        <p>级别编号: {viewingResignation?.levelId || '未分配'}</p>
-                        <p>级别名称: {viewingResignation?.levelName || '未提供'}</p>
-                        <p>基础薪资: {viewingResignation?.baseSalary ? `¥${viewingResignation.baseSalary}` : '未提供'}</p>
+                        <div className="space-y-2">
+                            <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">级别信息</h3>
+                            <div className="grid grid-cols-2 gap-2 text-sm">
+                                <p><span className="font-medium text-gray-600">级别编号:</span> {viewingResignation?.levelId || '未分配'}</p>
+                                <p><span className="font-medium text-gray-600">级别名称:</span> {viewingResignation?.levelName || '未提供'}</p>
+                                <p><span className="font-medium text-gray-600">基础薪资:</span> {viewingResignation?.baseSalary ? `¥${viewingResignation.baseSalary}` : '未提供'}</p>
+                            </div>
+                        </div>
 
-                        <h3>技能信息</h3>
-                        {viewingResignation?.skillNames && viewingResignation.skillNames.length > 0 ? (
-                            <ul>
-                                {viewingResignation.skillNames.map((skill, index) => (
-                                    <li key={index}>{skill}</li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <p>暂无技能信息</p>
-                        )}
+                        <div className="space-y-2">
+                            <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">技能信息</h3>
+                            {viewingResignation?.skillNames && viewingResignation.skillNames.length > 0 ? (
+                                <ul className="list-disc list-inside text-sm text-gray-700">
+                                    {viewingResignation.skillNames.map((skill, index) => (
+                                        <li key={index}>{skill}</li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p className="text-sm text-gray-400">暂无技能信息</p>
+                            )}
+                        </div>
 
-                        <button onClick={() => setModalOpen(false)}>关闭</button>
+                        <SecondaryButton onClick={() => setModalOpen(false)}>关闭</SecondaryButton>
                     </div>
                 </Modal>
             )}

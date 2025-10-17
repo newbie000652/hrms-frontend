@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { getAttendanceRecords, signIn, signOut, requestLeave, approveLeave, getPendingLeaveRequests } from '../services/attendanceService';
+import PageHeader from '../components/Layout/PageHeader';
+import SearchBar from '../components/Layout/SearchBar';
+import Table from '../components/Layout/Table';
+import { PrimaryButton, SecondaryButton } from '../components/Layout/Buttons';
 import Pagination from '../components/Pagination';
-import './AttendancePage.css';
 
 const AttendancePage = () => {
   const [attendanceRecords, setAttendanceRecords] = useState([]);
@@ -20,9 +23,7 @@ const AttendancePage = () => {
   const fetchAttendance = async () => {
     setIsLoading(true);
     try {
-      console.log('Fetching attendance with params:', { filter, currentPage, pageSize });
       const data = await getAttendanceRecords(filter, currentPage, pageSize);
-      console.log('Received attendance data:', data);
       setAttendanceRecords(data.records);
       setTotalRecords(data.total);
       // 计算总页数
@@ -127,21 +128,50 @@ const AttendancePage = () => {
 
   const { start, end } = getRecordRange();
 
+  const columns = [
+    { label: '序号', field: 'index', width: '60px', render: (row, index) => start + index },
+    { label: '员工ID', field: 'employeeId' },
+    { label: '员工姓名', field: 'employeeName' },
+    { label: '时间', field: 'time' },
+    { label: '操作', field: 'action' },
+    { label: '状态', field: 'status' },
+  ];
+
+  const actions = [
+    { 
+      label: '审批', 
+      variant: 'primary', 
+      onClick: (row) => handleApproveLeave(row.id),
+      condition: (row) => row.status === '请假待审批'
+    },
+  ];
+
+  const filteredActions = actions.map(action => ({
+    ...action,
+    onClick: (row) => action.condition && !action.condition(row) ? null : action.onClick(row)
+  }));
+
   return (
-    <div className="attendance-page">
-      <h1>考勤记录</h1>
-      {error && <p className="error-message">{error}</p>}
+    <div className="space-y-5">
+      <PageHeader title="考勤管理" />
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+          {error}
+        </div>
+      )}
+
       {isLoading ? (
-        <p>加载中...</p>
+        <div className="text-center py-12 text-gray-500">加载中...</div>
       ) : (
         <>
-          <div className="filter-container">
+          <SearchBar>
             <input
               type="date"
               name="date"
               value={filter.date}
               onChange={handleFilterChange}
-              placeholder="选择日期"
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
             />
             <input
               type="text"
@@ -149,55 +179,19 @@ const AttendancePage = () => {
               value={filter.employeeId}
               onChange={handleFilterChange}
               placeholder="输入员工ID"
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
             />
-            <button onClick={handleSearch}>搜索</button>
-            <div className="button-group">
-              <button onClick={() => handleAttendanceAction('签到')}>签到</button>
-              <button onClick={() => handleAttendanceAction('签退')}>签退</button>
-              <button onClick={() => handleAttendanceAction('请假')}>请假</button>
-              <button onClick={handleShowPendingLeaves}>显示待审批请假</button>
+            <PrimaryButton onClick={handleSearch}>搜索</PrimaryButton>
+            <div className="col-span-full flex gap-2">
+              <PrimaryButton onClick={() => handleAttendanceAction('签到')}>签到</PrimaryButton>
+              <PrimaryButton onClick={() => handleAttendanceAction('签退')}>签退</PrimaryButton>
+              <PrimaryButton onClick={() => handleAttendanceAction('请假')}>请假</PrimaryButton>
+              <PrimaryButton onClick={handleShowPendingLeaves}>显示待审批请假</PrimaryButton>
             </div>
-          </div>
-          <div className="attendance-table-container">
-            <table className="attendance-table">
-              <thead>
-                <tr>
-                  <th width="60">序号</th>
-                  <th>员工ID</th>
-                  <th>员工姓名</th>
-                  <th>时间</th>
-                  <th>操作</th>
-                  <th>状态</th>
-                  <th>审批</th>
-                </tr>
-              </thead>
-              <tbody>
-                {attendanceRecords.length > 0 ? (
-                  attendanceRecords.map((record, index) => (
-                    <tr key={record.id}>
-                      <td className="record-number">{start + index}</td>
-                      <td>{record.employeeId}</td>
-                      <td>{record.employeeName}</td>
-                      <td>{record.time}</td>
-                      <td>{record.action}</td>
-                      <td>{record.status}</td>
-                      <td>
-                        {record.status === '请假待审批' && (
-                          <button onClick={() => handleApproveLeave(record.id)}>审批</button>
-                        )}
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="7" className="no-data">暂无考勤记录。</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-          
-          {/* 使用通用分页组件 */}
+          </SearchBar>
+
+          <Table columns={columns} data={attendanceRecords} actions={filteredActions} emptyMessage="暂无考勤记录" />
+
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}

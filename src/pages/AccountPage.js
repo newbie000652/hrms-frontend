@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { getAccounts, addAccount, updateAccount, deleteAccount, getAccountById } from '../services/accountService';
+import PageHeader from '../components/Layout/PageHeader';
+import SearchBar from '../components/Layout/SearchBar';
+import Table from '../components/Layout/Table';
+import { PrimaryButton, SecondaryButton } from '../components/Layout/Buttons';
 import Modal from '../components/Modal';
 import Pagination from '../components/Pagination';
-import './AccountPage.css';
 
 const AccountPage = () => {
     const [accounts, setAccounts] = useState([]);
@@ -104,62 +107,50 @@ const AccountPage = () => {
 
     const { start, end } = getRecordRange();
 
+    const columns = [
+        { label: '序号', field: 'index', width: '60px', render: (row, index) => start + index },
+        { label: 'ID', field: 'id' },
+        { label: '账户', field: 'account' },
+        { label: '员工ID', field: 'employeeId' },
+        { label: '角色', field: 'role' },
+    ];
+
+    const actions = [
+        { label: '编辑', variant: 'primary', onClick: (row) => handleEdit(row.id) },
+        { label: '删除', variant: 'danger', onClick: (row) => handleDeleteAccount(row.id) },
+    ];
+
     return (
-        <div className="account-page">
-            <h1>账户管理</h1>
-            {error && <p className="error-message">{error}</p>}
+        <div className="space-y-5">
+            <PageHeader
+                title="账户管理"
+                actions={<PrimaryButton onClick={handleAdd}>新增账户</PrimaryButton>}
+            />
+
+            {error && (
+                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+                    {error}
+                </div>
+            )}
+
             {isLoading ? (
-                <p>加载中...</p>
+                <div className="text-center py-12 text-gray-500">加载中...</div>
             ) : (
                 <>
-                    <div className="action-container">
+                    <SearchBar>
                         <input
                             type="text"
                             name="accountId"
                             value={search.accountId}
                             onChange={handleSearchChange}
                             placeholder="搜索账户ID"
+                            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
                         />
-                        <button onClick={handleSearch}>搜索</button>
-                        <button onClick={handleAdd}>新增账户</button>
-                    </div>
-                    <div className="account-table-container">
-                        <table className="account-table">
-                            <thead>
-                            <tr>
-                                <th width="60">序号</th>
-                                <th>ID</th>
-                                <th>账户</th>
-                                <th>员工ID</th>
-                                <th>角色</th>
-                                <th>操作</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {accounts.length > 0 ? (
-                                accounts.map((account, index) => (
-                                    <tr key={account.id}>
-                                        <td className="record-number">{start + index}</td>
-                                        <td>{account.id}</td>
-                                        <td>{account.account}</td>
-                                        <td>{account.employeeId}</td>
-                                        <td>{account.role}</td>
-                                        <td>
-                                            <button onClick={() => handleEdit(account.id)}>编辑</button>
-                                            <button onClick={() => handleDeleteAccount(account.id)}>删除</button>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="6" className="no-data">暂无账户记录。</td>
-                                </tr>
-                            )}
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    {/* 使用通用分页组件 */}
+                        <PrimaryButton onClick={handleSearch}>搜索</PrimaryButton>
+                    </SearchBar>
+
+                    <Table columns={columns} data={accounts} actions={actions} emptyMessage="暂无账户记录" />
+
                     <Pagination
                         currentPage={currentPage}
                         totalPages={totalPages}
@@ -177,53 +168,57 @@ const AccountPage = () => {
 
             {modalOpen && (
                 <Modal title={editingAccount ? '编辑账户' : '新增账户'} onClose={() => setModalOpen(false)}>
-                    <div>
-                        <label>
-                            账户:
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">账户</label>
                             <input
                                 type="text"
                                 value={editingAccount?.account || ''}
                                 onChange={(e) =>
                                     setEditingAccount((prev) => ({ ...prev, account: e.target.value }))
                                 }
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
                             />
-                        </label>
-                        <label>
-                            密码:
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">密码</label>
                             <input
                                 type="password"
                                 value={editingAccount?.password || ''}
                                 onChange={(e) =>
                                     setEditingAccount((prev) => ({ ...prev, password: e.target.value }))
                                 }
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
                             />
-                        </label>
-                        <label>
-                            员工ID:
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">员工ID</label>
                             <input
                                 type="text"
                                 value={editingAccount?.employeeId || ''}
                                 onChange={(e) =>
                                     setEditingAccount((prev) => ({ ...prev, employeeId: e.target.value }))
                                 }
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
                             />
-                        </label>
-                        <label>
-                            角色:
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">角色</label>
                             <select
                                 value={editingAccount?.role || ''}
                                 onChange={(e) =>
                                     setEditingAccount((prev) => ({ ...prev, role: e.target.value }))
                                 }
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
                             >
                                 <option value="管理员">管理员</option>
                                 <option value="领导">领导</option>
                                 <option value="员工">员工</option>
                             </select>
-                        </label>
-                        <div className="modal-buttons">
-                            <button onClick={() => handleSaveAccount(editingAccount)}>保存</button>
-                            <button onClick={() => setModalOpen(false)}>取消</button>
+                        </div>
+                        <div className="flex gap-2 justify-end pt-4">
+                            <PrimaryButton onClick={() => handleSaveAccount(editingAccount)}>保存</PrimaryButton>
+                            <SecondaryButton onClick={() => setModalOpen(false)}>取消</SecondaryButton>
                         </div>
                     </div>
                 </Modal>

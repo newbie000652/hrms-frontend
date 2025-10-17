@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { PrimaryButton, SecondaryButton } from '../Layout/Buttons';
 
-const SalaryForm = ({ salary, onSave }) => {
+const SalaryForm = ({ salary, onSave, onCancel }) => {
   const [employeeName, setEmployeeName] = useState('');
   const [baseSalary, setBaseSalary] = useState('');
   const [bonus, setBonus] = useState('');
@@ -8,10 +9,10 @@ const SalaryForm = ({ salary, onSave }) => {
 
   useEffect(() => {
     if (salary) {
-      setEmployeeName(salary.employeeName);
-      setBaseSalary(salary.baseSalary);
-      setBonus(salary.bonus);
-      setPayDate(salary.payDate);
+      setEmployeeName(salary.employeeName || '');
+      setBaseSalary(salary.baseSalary || '');
+      setBonus(salary.bonus || '');
+      setPayDate(salary.payDate || '');
     }
   }, [salary]);
 
@@ -28,44 +29,51 @@ const SalaryForm = ({ salary, onSave }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label>员工姓名</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">员工姓名</label>
         <input
           type="text"
           value={employeeName}
           onChange={(e) => setEmployeeName(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-600"
           required
         />
       </div>
       <div>
-        <label>基础薪资</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">基础薪资</label>
         <input
           type="number"
           value={baseSalary}
           onChange={(e) => setBaseSalary(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-600"
           required
         />
       </div>
       <div>
-        <label>奖金</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">奖金</label>
         <input
           type="number"
           value={bonus}
           onChange={(e) => setBonus(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-600"
           required
         />
       </div>
       <div>
-        <label>发薪日期</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">发薪日期</label>
         <input
           type="date"
           value={payDate}
           onChange={(e) => setPayDate(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-600"
           required
         />
       </div>
-      <button type="submit">{salary ? '保存' : '新增'}</button>
+      <div className="flex gap-2 justify-end pt-4 border-t">
+        <PrimaryButton type="submit">保存</PrimaryButton>
+        {onCancel && <SecondaryButton type="button" onClick={onCancel}>取消</SecondaryButton>}
+      </div>
     </form>
   );
 };

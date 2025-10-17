@@ -9,18 +9,12 @@
   box-sizing: border-box;
 }
 
-.dashboard-container h1 {
-  font-size: var(--font-size-4xl);
-  font-weight: var(--font-weight-bold);
-  margin-bottom: var(--spacing-xl);
-  color: var(--text-color);
-  text-align: center;
-}
+.dashboard-container h1 { color: var(--text-color); }
 
 .dashboard-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: var(--spacing-xl);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--spacing-md);
   margin: 0 auto;
   padding: 0;
   width: 100%;
@@ -28,26 +22,7 @@
   box-sizing: border-box;
 }
 
-.card {
-  background: var(--background-color-light);
-  border: 1px solid var(--border-color-light);
-  border-radius: var(--border-radius-lg);
-  padding: var(--spacing-xl) var(--spacing-lg);
-  box-shadow: var(--shadow-sm);
-  cursor: pointer;
-  transition: all var(--transition-normal);
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 100%;
-  min-height: 200px;
-  box-sizing: border-box;
-  background: linear-gradient(135deg, var(--background-color-light) 0%, var(--background-color-secondary) 100%);
-}
+.card { padding: var(--spacing-md); }
 
 .card::before {
   content: '';
@@ -73,12 +48,7 @@
   transition: opacity var(--transition-normal);
 }
 
-.card:hover {
-  transform: translateY(-8px);
-  box-shadow: var(--shadow-xl);
-  border-color: var(--primary-color);
-  background: linear-gradient(135deg, var(--background-color-light) 0%, var(--primary-color-lighter) 100%);
-}
+.card:hover { transform: translateY(-2px); }
 
 .card:hover::before {
   transform: scaleX(1);
@@ -88,22 +58,14 @@
   opacity: 1;
 }
 
-.card h2 {
-  font-size: var(--font-size-2xl);
-  margin-bottom: var(--spacing-md);
-  color: var(--text-color);
-  font-weight: var(--font-weight-semibold);
-  position: relative;
-  z-index: 1;
-  transition: color var(--transition-normal);
-}
+.card h2 { font-size: var(--font-size-xl); }
 
 .card:hover h2 {
   color: var(--primary-color);
 }
 
 .card p {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
   color: var(--text-color-secondary);
   line-height: var(--line-height-normal);
   margin: 0;

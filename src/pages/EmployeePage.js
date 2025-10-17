@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { getEmployees, addEmployee, updateEmployee, getEmployeeDetails, markEmployeeAsInactive } from '../services/employeeService';
-import './EmployeePage.css';
+import PageHeader from '../components/Layout/PageHeader';
+import SearchBar from '../components/Layout/SearchBar';
+import Table from '../components/Layout/Table';
+import { PrimaryButton } from '../components/Layout/Buttons';
 import Modal from '../components/Modal';
 import EmployeeForm from '../components/Form/EmployeeForm';
 import EmployeeDetails from '../components/EmployeeDetails';
@@ -142,21 +145,45 @@ const EmployeePage = () => {
 
   const { start, end } = getRecordRange();
 
+  const columns = [
+    { label: '序号', field: 'index', width: '60px', render: (row, index) => start + index },
+    { label: '编号', field: 'id' },
+    { label: '姓名', field: 'name' },
+    { label: '级别', field: 'levelId' },
+    { label: '部门', field: 'departmentId', render: (row) => row.departmentId || '未分配' },
+  ];
+
+  const actions = [
+    { label: '详情', variant: 'primary', onClick: (row) => handleViewDetails(row.id) },
+    { label: '修改', variant: 'default', onClick: handleEdit },
+    { label: '删除', variant: 'danger', onClick: (row) => handleDeleteEmployee(row.id) },
+  ];
+
   return (
-    <div className="employee-page">
-      <h1>员工管理</h1>
-      {error && <p className="error-message">{error}</p>}
+    <div className="space-y-5">
+      <PageHeader
+        title="员工管理"
+        actions={<PrimaryButton onClick={handleAdd}>新增员工</PrimaryButton>}
+      />
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+          {error}
+        </div>
+      )}
+
       {isLoading ? (
-        <p>加载中...</p>
+        <div className="text-center py-12 text-gray-500">加载中...</div>
       ) : (
         <>
-          <div className="search-container">
+          <SearchBar>
             <input
               type="number"
               name="employeeId"
               value={search.employeeId}
               onChange={handleSearchChange}
               placeholder="员工编号"
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
             />
             <input
               type="text"
@@ -164,6 +191,7 @@ const EmployeePage = () => {
               value={search.employeeName}
               onChange={handleSearchChange}
               placeholder="员工姓名"
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
             />
             <input
               type="number"
@@ -171,6 +199,7 @@ const EmployeePage = () => {
               value={search.level}
               onChange={handleSearchChange}
               placeholder="员工级别"
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
             />
             <input
               type="number"
@@ -178,51 +207,13 @@ const EmployeePage = () => {
               value={search.department}
               onChange={handleSearchChange}
               placeholder="员工部门"
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
             />
-            <button onClick={handleSearch}>搜索</button>
-          </div>
-          <div className="add-button-container">
-            <button className="add-button" onClick={handleAdd}>新增员工</button>
-          </div>
-          
-          <div className="table-container">
-            <table className="employee-table">
-              <thead>
-                <tr>
-                  <th width="60">序号</th>
-                  <th>编号</th>
-                  <th>姓名</th>
-                  <th>级别</th>
-                  <th>部门</th>
-                  <th>操作</th>
-                </tr>
-              </thead>
-              <tbody>
-                {Array.isArray(employees) && employees.length > 0 ? (
-                  employees.map((employee, index) => (
-                    <tr key={employee.id}>
-                      <td className="record-number">{start + index}</td>
-                      <td>{employee.id}</td>
-                      <td>{employee.name}</td>
-                      <td>{employee.levelId}</td>
-                      <td>{employee.departmentId || '未分配'}</td>
-                      <td>
-                        <button onClick={() => handleViewDetails(employee.id)}>详细信息</button>
-                        <button onClick={() => handleEdit(employee)}>修改</button>
-                        <button onClick={() => handleDeleteEmployee(employee.id)}>删除</button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="6" className="no-data">暂无员工数据。</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-          
-          {/* 使用通用分页组件 */}
+            <PrimaryButton onClick={handleSearch}>搜索</PrimaryButton>
+          </SearchBar>
+
+          <Table columns={columns} data={employees} actions={actions} emptyMessage="暂无员工数据" />
+
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}

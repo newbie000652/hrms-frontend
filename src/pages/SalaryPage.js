@@ -1,10 +1,13 @@
 // src/pages/SalaryPage.js
 import React, { useEffect, useState } from 'react';
 import { getSalaries, createDefaultSalary, calculateSalary, updateSalary, deleteSalary } from '../services/salaryService';
+import PageHeader from '../components/Layout/PageHeader';
+import SearchBar from '../components/Layout/SearchBar';
+import Table from '../components/Layout/Table';
+import { PrimaryButton } from '../components/Layout/Buttons';
 import Modal from '../components/Modal';
 import SalaryForm from '../components/Form/SalaryForm';
 import Pagination from '../components/Pagination';
-import './salaryPage.css';
 
 const SalaryPage = () => {
     const [salaries, setSalaries] = useState([]);
@@ -102,21 +105,43 @@ const SalaryPage = () => {
 
     const { start, end } = getRecordRange();
 
+    const columns = [
+        { label: '序号', field: 'index', width: '60px', render: (row, index) => start + index },
+        { label: '员工编号', field: 'employeeId' },
+        { label: '基础薪资', field: 'baseSalary' },
+        { label: '奖金', field: 'bonus' },
+        { label: '罚款', field: 'penalty' },
+        { label: '创建时间', field: 'createTime' },
+        { label: '更新时间', field: 'updateTime' },
+    ];
+
+    const actions = [
+        { label: '编辑', variant: 'default', onClick: handleEdit },
+        { label: '删除', variant: 'danger', onClick: (row) => handleDeleteSalary(row.id) },
+    ];
+
     return (
-        <div className="salary-page">
-            <h1>工资管理</h1>
-            {error && <p className="error-message">{error}</p>}
+        <div className="space-y-5">
+            <PageHeader title="工资管理" />
+
+            {error && (
+                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+                    {error}
+                </div>
+            )}
+
             {isLoading ? (
-                <p>加载中...</p>
+                <div className="text-center py-12 text-gray-500">加载中...</div>
             ) : (
                 <>
-                    <div className="search-container">
+                    <SearchBar>
                         <input
                             type="text"
                             name="searchBy"
                             value={search.searchBy}
                             onChange={handleSearchChange}
                             placeholder="搜索字段"
+                            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
                         />
                         <input
                             type="text"
@@ -124,50 +149,13 @@ const SalaryPage = () => {
                             value={search.keyword}
                             onChange={handleSearchChange}
                             placeholder="关键字"
+                            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
                         />
-                        <button onClick={handleSearch}>搜索</button>
-                    </div>
-                    <div className="salary-table-container">
-                        <table className="salary-table">
-                            <thead>
-                                <tr>
-                                    <th width="60">序号</th>
-                                    <th>员工编号</th>
-                                    <th>基础薪资</th>
-                                    <th>奖金</th>
-                                    <th>罚款</th>
-                                    <th>创建时间</th>
-                                    <th>更新时间</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {salaries.length > 0 ? (
-                                    salaries.map((salary, index) => (
-                                        <tr key={salary.id}>
-                                            <td className="record-number">{start + index}</td>
-                                            <td>{salary.employeeId}</td>
-                                            <td>{salary.baseSalary}</td>
-                                            <td>{salary.bonus}</td>
-                                            <td>{salary.penalty}</td>
-                                            <td>{salary.createTime}</td>
-                                            <td>{salary.updateTime}</td>
-                                            <td>
-                                                <button onClick={() => handleEdit(salary)}>编辑</button>
-                                                <button onClick={() => handleDeleteSalary(salary.id)}>删除</button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan="8" className="no-data">暂无工资记录。</td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    {/* 使用通用分页组件 */}
+                        <PrimaryButton onClick={handleSearch}>搜索</PrimaryButton>
+                    </SearchBar>
+
+                    <Table columns={columns} data={salaries} actions={actions} emptyMessage="暂无工资记录" />
+
                     <Pagination
                         currentPage={currentPage}
                         totalPages={totalPages}
@@ -185,7 +173,11 @@ const SalaryPage = () => {
 
             {modalOpen && (
                 <Modal title="编辑工资" onClose={() => setModalOpen(false)}>
-                    <SalaryForm salary={editingSalary} onSave={handleSaveSalary} />
+                    <SalaryForm 
+                        salary={editingSalary} 
+                        onSave={handleSaveSalary} 
+                        onCancel={() => setModalOpen(false)}
+                    />
                 </Modal>
             )}
         </div>

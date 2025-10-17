@@ -41,7 +41,7 @@
 }
 
 .sidebar-header {
-  padding: var(--spacing-lg) var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-md);
   border-bottom: 1px solid var(--border-color-light);
   background: linear-gradient(135deg, var(--primary-color), var(--primary-color-hover));
   color: var(--text-color-light);
@@ -98,7 +98,7 @@
 .sidebar a {
   display: flex;
   align-items: center;
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
   text-decoration: none;
   color: var(--text-color-secondary);
   transition: all var(--transition-normal);
@@ -151,7 +151,7 @@
 }
 
 .menu-icon {
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-base);
   margin-right: var(--spacing-md);
   width: 20px;
   text-align: center;

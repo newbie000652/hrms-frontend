@@ -33,15 +33,16 @@ body {
   overflow-x: hidden;
 }
 
-/* Header区域 */
+/* Header区域 - 微软风格：白色背景 */
 .app-container > header {
   grid-area: header;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-color-hover));
-  color: var(--text-color-light);
-  box-shadow: var(--shadow-md);
+  background: #ffffff;
+  color: #1f2937;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
   z-index: var(--z-fixed);
   position: relative;
   width: 100%;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 /* Sidebar区域 */
@@ -60,7 +61,7 @@ body {
 .app-container > main {
   grid-area: main;
   background: var(--background-color);
-  padding: var(--container-padding);
+  padding: calc(var(--container-padding) - 6px);
   overflow-y: auto;
   position: relative;
   width: calc(100vw - var(--sidebar-width));
@@ -132,13 +133,14 @@ body {
   box-sizing: border-box;
 }
 
-/* Footer区域 */
+/* Footer区域 - 微软风格：浅灰背景 */
 .app-container > footer {
   grid-area: footer;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-color-hover));
-  color: var(--text-color-light);
+  background: #f9fafb;
+  color: #6b7280;
   position: relative;
   width: 100%;
+  border-top: 1px solid #e5e7eb;
 }
 
 /* 响应式布局 */
@@ -200,8 +202,8 @@ a:hover {
   color: var(--primary-color-hover);
 }
 
-/* 通用按钮样式 */
-button {
+/* 通用按钮样式 - 已禁用，使用 Tailwind 类 */
+/* button {
   font-family: inherit;
   color: var(--text-color-light);
   background-color: var(--primary-color);
@@ -214,7 +216,7 @@ button {
   font-weight: var(--font-weight-medium);
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  justify-center: center;
   gap: var(--spacing-xs);
 }
 
@@ -233,10 +235,10 @@ button:disabled {
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
-}
+} */
 
-/* 按钮变体 */
-button.btn-secondary {
+/* 按钮变体 - 已禁用，使用 Tailwind 类 */
+/* button.btn-secondary {
   background-color: var(--secondary-color);
 }
 
@@ -266,7 +268,7 @@ button.btn-warning {
 
 button.btn-warning:hover {
   background-color: var(--warning-color-hover);
-}
+} */
 
 /* 通用表单元素样式 */
 input,
@@ -286,9 +288,9 @@ textarea {
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: var(--primary-color);
+  border-color: #0078d4;
   outline: none;
-  box-shadow: 0 0 0 3px var(--primary-color-light);
+  box-shadow: 0 0 0 1px #0078d4;
   background-color: var(--background-color-light);
 }
 
