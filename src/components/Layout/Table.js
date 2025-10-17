@@ -1,5 +1,6 @@
 /* Table.js - 通用表格组件 */
 import React from 'react';
+import { SmallButton } from './Buttons';
 
 const Table = ({ columns, data, actions, emptyMessage = '暂无数据' }) => {
   return (
@@ -32,19 +33,20 @@ const Table = ({ columns, data, actions, emptyMessage = '暂无数据' }) => {
                   <td className="px-4 py-3">
                     <div className="flex gap-2">
                       {actions.map((action, actionIdx) => (
-                        <button
+                        <SmallButton
                           key={actionIdx}
                           onClick={() => action.onClick(row)}
-                          className={`px-3 py-1 text-sm rounded transition-colors font-semibold ${
+                          variant={
                             action.variant === 'primary'
-                              ? 'bg-primary-50 text-primary-600 hover:bg-primary-100'
+                              ? 'primary'
                               : action.variant === 'danger'
-                              ? 'bg-red-50 text-red-600 hover:bg-red-100'
-                              : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
-                          }`}
+                              ? 'danger'
+                              : 'secondary'
+                          }
+                          className="shadow-none focus:outline-none focus:ring-2 focus:ring-primary-200"
                         >
                           {action.label}
-                        </button>
+                        </SmallButton>
                       ))}
                     </div>
                   </td>
