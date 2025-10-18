@@ -1,26 +1,47 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { getAttendanceRecords, signIn, signOut, requestLeave, approveLeave, getPendingLeaveRequests } from '../services/attendanceService';
+import { getActiveEmployees, getInactiveEmployees } from '../services/employeeService';
 import PageHeader from '../components/Layout/PageHeader';
 import SearchBar from '../components/Layout/SearchBar';
 import Table from '../components/Layout/Table';
-import { PrimaryButton, SecondaryButton } from '../components/Layout/Buttons';
+import Alert from '../components/Layout/Alert';
+import { PrimaryButton } from '../components/Layout/Buttons';
 import Pagination from '../components/Pagination';
 
 const AttendancePage = () => {
   const [attendanceRecords, setAttendanceRecords] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [filterForm, setFilterForm] = useState({ employeeId: '', date: '' });
   const [filter, setFilter] = useState({ employeeId: '', date: '' });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
   const [pageSize, setPageSize] = useState(10);
+  const [employeeNameMap, setEmployeeNameMap] = useState({});
 
+  // 放在函数声明之后，见下方第二个 useEffect
+
+  // 获取员工姓名映射，用于表格显示
   useEffect(() => {
-    fetchAttendance();
-  }, [filter, currentPage, pageSize]);
+    const fetchEmployeeNames = async () => {
+      try {
+        const [activeList, inactiveList] = await Promise.all([
+          getActiveEmployees(),
+          getInactiveEmployees(),
+        ]);
+        const list = [...activeList, ...inactiveList];
+        const map = {};
+        list.forEach(emp => { map[String(emp.id)] = emp.name; });
+        setEmployeeNameMap(map);
+      } catch (e) {
+        // 静默失败
+      }
+    };
+    fetchEmployeeNames();
+  }, []);
 
-  const fetchAttendance = async () => {
+  const fetchAttendance = useCallback(async () => {
     setIsLoading(true);
     try {
       const data = await getAttendanceRecords(filter, currentPage, pageSize);
@@ -29,12 +50,7 @@ const AttendancePage = () => {
       // 计算总页数
       const calculatedTotalPages = Math.ceil(data.total / pageSize);
       setTotalPages(calculatedTotalPages);
-      console.log('Calculated pagination:', { 
-        total: data.total, 
-        pageSize, 
-        calculatedTotalPages, 
-        currentPage 
-      });
+      // 记录页码计算
       // 如果当前页超出总页数，重置为第一页
       if (currentPage > calculatedTotalPages && calculatedTotalPages > 0) {
         setCurrentPage(1);
@@ -48,7 +64,12 @@ const AttendancePage = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [filter, currentPage, pageSize]);
+
+  // 触发加载
+  useEffect(() => {
+    fetchAttendance();
+  }, [fetchAttendance]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -84,12 +105,12 @@ const AttendancePage = () => {
   };
 
   const handleFilterChange = (e) => {
-    setFilter({ ...filter, [e.target.name]: e.target.value });
+    setFilterForm({ ...filterForm, [e.target.name]: e.target.value });
   };
 
   const handleSearch = () => {
-    setCurrentPage(1);
-    fetchAttendance();
+  setCurrentPage(1);
+  setFilter(filterForm);
   };
 
   const handleShowPendingLeaves = async () => {
@@ -126,7 +147,13 @@ const AttendancePage = () => {
     return { start, end };
   };
 
-  const { start, end } = getRecordRange();
+  const { start } = getRecordRange();
+
+  // 将姓名映射注入数据供表格显示
+  const tableData = attendanceRecords.map(r => ({
+    ...r,
+    employeeName: r.employeeName || employeeNameMap[String(r.employeeId)] || '-',
+  }));
 
   const columns = [
     { label: '序号', field: 'index', width: '60px', render: (row, index) => start + index },
@@ -155,11 +182,7 @@ const AttendancePage = () => {
     <div className="space-y-5">
       <PageHeader title="考勤管理" />
 
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
-          {error}
-        </div>
-      )}
+      {error && <Alert>{error}</Alert>}
 
       {isLoading ? (
         <div className="text-center py-12 text-gray-500">加载中...</div>
@@ -176,7 +199,7 @@ const AttendancePage = () => {
             <input
               type="text"
               name="employeeId"
-              value={filter.employeeId}
+              value={filterForm.employeeId}
               onChange={handleFilterChange}
               placeholder="输入员工ID"
               className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
@@ -190,7 +213,7 @@ const AttendancePage = () => {
             </div>
           </SearchBar>
 
-          <Table columns={columns} data={attendanceRecords} actions={filteredActions} emptyMessage="暂无考勤记录" />
+          <Table columns={columns} data={tableData} actions={filteredActions} emptyMessage="暂无考勤记录" />
 
           <Pagination
             currentPage={currentPage}

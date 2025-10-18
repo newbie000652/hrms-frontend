@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import useMetaOptions from '../../hooks/useMetaOptions';
 import { PrimaryButton, SecondaryButton } from '../Layout/Buttons';
 
 const EmployeeForm = ({ employee = {}, onSave, onCancel }) => {
@@ -8,9 +9,11 @@ const EmployeeForm = ({ employee = {}, onSave, onCancel }) => {
         email: '',
         phone: '',
         entry_date: '',
-        level_id: 0,  // 初始化为数字 0
-        department_id: 0,  // 初始化为数字 0
+        level_id: '',
+        department_id: '',
     });
+
+    const { levels, departments } = useMetaOptions();
 
     useEffect(() => {
         if (employee) {
@@ -25,6 +28,8 @@ const EmployeeForm = ({ employee = {}, onSave, onCancel }) => {
             });
         }
     }, [employee]);
+
+    // 元数据通过 hook 加载
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -111,25 +116,33 @@ const EmployeeForm = ({ employee = {}, onSave, onCancel }) => {
                 </div>
                 <div className="flex flex-col gap-2">
                     <label className="text-sm font-medium text-gray-700">员工级别</label>
-                    <input
-                        type="number"
+                    <select
                         name="level_id"
                         value={formData.level_id}
                         onChange={handleChange}
                         required
                         className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-700 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200"
-                    />
+                    >
+                        <option value="">选择级别</option>
+                        {levels.map(l => (
+                            <option key={l.id} value={l.id}>{l.name || l.id}</option>
+                        ))}
+                    </select>
                 </div>
                 <div className="flex flex-col gap-2">
-                    <label className="text-sm font-medium text-gray-700">部门ID</label>
-                    <input
-                        type="number"
+                    <label className="text-sm font-medium text-gray-700">部门</label>
+                    <select
                         name="department_id"
                         value={formData.department_id}
                         onChange={handleChange}
                         required
                         className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-700 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200"
-                    />
+                    >
+                        <option value="">选择部门</option>
+                        {departments.map(d => (
+                            <option key={d.id} value={d.id}>{d.name || d.id}</option>
+                        ))}
+                    </select>
                 </div>
             </div>
             <div className="flex justify-end gap-3 pt-2">

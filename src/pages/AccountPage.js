@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { getAccounts, addAccount, updateAccount, deleteAccount, getAccountById } from '../services/accountService';
 import PageHeader from '../components/Layout/PageHeader';
 import SearchBar from '../components/Layout/SearchBar';
 import Table from '../components/Layout/Table';
+import Alert from '../components/Layout/Alert';
 import { PrimaryButton, SecondaryButton } from '../components/Layout/Buttons';
 import Modal from '../components/Modal';
 import Pagination from '../components/Pagination';
@@ -17,13 +18,19 @@ const AccountPage = () => {
     const [totalPages, setTotalPages] = useState(1);
     const [totalRecords, setTotalRecords] = useState(0);
     const [pageSize, setPageSize] = useState(10);
-    const [search, setSearch] = useState({ accountId: '' });
+    const [searchForm, setSearchForm] = useState({ accountId: '', account: '', employeeId: '', role: '' });
+    const [searchQuery, setSearchQuery] = useState({ accountId: '', account: '', employeeId: '', role: '' });
 
-    const fetchAccounts = async () => {
+    const fetchAccounts = useCallback(async () => {
         try {
-            const data = await getAccounts(currentPage, pageSize, search.accountId);
+            const data = await getAccounts(currentPage, pageSize, {
+                accountId: searchQuery.accountId || undefined,
+                account: searchQuery.account || undefined,
+                employeeId: searchQuery.employeeId || undefined,
+                role: searchQuery.role || undefined,
+            });
             setAccounts(data.records);
-            setTotalPages(data.pages || Math.ceil(data.total / pageSize));
+            setTotalPages(Math.ceil((data.total || 0) / pageSize));
             setTotalRecords(data.total);
         } catch (err) {
             setError('加载账户失败');
@@ -33,11 +40,11 @@ const AccountPage = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [currentPage, pageSize, searchQuery]);
 
     useEffect(() => {
         fetchAccounts();
-    }, [currentPage, pageSize, search]);
+    }, [fetchAccounts]);
 
     const handleSaveAccount = async (account) => {
         try {
@@ -91,11 +98,12 @@ const AccountPage = () => {
     };
 
     const handleSearchChange = (e) => {
-        setSearch({ ...search, [e.target.name]: e.target.value });
+    setSearchForm({ ...searchForm, [e.target.name]: e.target.value });
     };
 
     const handleSearch = () => {
-        setCurrentPage(1);
+    setCurrentPage(1);
+    setSearchQuery(searchForm);
     };
 
     // 计算当前页的记录序号范围
@@ -105,7 +113,7 @@ const AccountPage = () => {
         return { start, end };
     };
 
-    const { start, end } = getRecordRange();
+    const { start } = getRecordRange();
 
     const columns = [
         { label: '序号', field: 'index', width: '60px', render: (row, index) => start + index },
@@ -127,11 +135,7 @@ const AccountPage = () => {
                 actions={<PrimaryButton onClick={handleAdd}>新增账户</PrimaryButton>}
             />
 
-            {error && (
-                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
-                    {error}
-                </div>
-            )}
+                {error && <Alert>{error}</Alert>}
 
             {isLoading ? (
                 <div className="text-center py-12 text-gray-500">加载中...</div>
@@ -141,11 +145,38 @@ const AccountPage = () => {
                         <input
                             type="text"
                             name="accountId"
-                            value={search.accountId}
+                            value={searchForm.accountId}
                             onChange={handleSearchChange}
-                            placeholder="搜索账户ID"
+                            placeholder="账户ID"
                             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
                         />
+                        <input
+                            type="text"
+                            name="account"
+                            value={searchForm.account}
+                            onChange={handleSearchChange}
+                            placeholder="账户名"
+                            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
+                        />
+                        <input
+                            type="text"
+                            name="employeeId"
+                            value={searchForm.employeeId}
+                            onChange={handleSearchChange}
+                            placeholder="员工ID"
+                            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
+                        />
+                        <select
+                            name="role"
+                            value={searchForm.role}
+                            onChange={handleSearchChange}
+                            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
+                        >
+                            <option value="">全部角色</option>
+                            <option value="管理员">管理员</option>
+                            <option value="领导">领导</option>
+                            <option value="员工">员工</option>
+                        </select>
                         <PrimaryButton onClick={handleSearch}>搜索</PrimaryButton>
                     </SearchBar>
 

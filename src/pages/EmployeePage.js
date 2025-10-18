@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
+// axios removed; using metaService instead
+import useMetaOptions from '../hooks/useMetaOptions';
 import { getEmployees, addEmployee, updateEmployee, getEmployeeDetails, markEmployeeAsInactive } from '../services/employeeService';
 import PageHeader from '../components/Layout/PageHeader';
 import SearchBar from '../components/Layout/SearchBar';
 import Table from '../components/Layout/Table';
 import { PrimaryButton } from '../components/Layout/Buttons';
+import Alert from '../components/Layout/Alert';
 import Modal from '../components/Modal';
 import EmployeeForm from '../components/Form/EmployeeForm';
 import EmployeeDetails from '../components/EmployeeDetails';
@@ -21,11 +24,14 @@ const EmployeePage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
   const [pageSize, setPageSize] = useState(10);
-  const [search, setSearch] = useState({ employeeId: '', employeeName: '', level: '', department: '' });
+  // 输入表单态与已应用查询态分离：只有点击“搜索”才应用
+  const [searchForm, setSearchForm] = useState({ employeeId: '', employeeName: '', level: '', department: '' });
+  const [searchQuery, setSearchQuery] = useState({ employeeId: '', employeeName: '', level: '', department: '' });
+  const { departments, levels } = useMetaOptions();
 
   const fetchEmployees = async () => {
     try {
-      const data = await getEmployees(currentPage, search, pageSize);
+  const data = await getEmployees(currentPage, searchQuery, pageSize);
       
       setEmployees(data.records);
       setTotalRecords(data.total);
@@ -50,7 +56,10 @@ const EmployeePage = () => {
   // useEffect 中调用
   useEffect(() => {
     fetchEmployees();
-  }, [currentPage, pageSize, search]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, pageSize, searchQuery]);
+
+  // meta options now loaded via hook
 
   // 在需要调用 fetchEmployees 的地方直接使用
   const handleSaveEmployee = async (formData) => {
@@ -121,14 +130,14 @@ const EmployeePage = () => {
   };
 
   const handleSearchChange = (e) => {
-    const { name, value, type } = e.target;
-    const formattedValue =
-      type === 'number' && value === '' ? '' : value.trim();
-    setSearch({ ...search, [name]: formattedValue });
+    const { name, value } = e.target;
+    // 保留原始输入，避免中文输入法组合期的闪烁；在提交时再做清洗
+    setSearchForm({ ...searchForm, [name]: value });
   };
 
   const handleSearch = () => {
     setCurrentPage(1);
+    setSearchQuery(searchForm);
   };
 
   const handleCancel = () => {
@@ -143,7 +152,7 @@ const EmployeePage = () => {
     return { start, end };
   };
 
-  const { start, end } = getRecordRange();
+  const { start } = getRecordRange();
 
   const columns = [
     { label: '序号', field: 'index', width: '60px', render: (row, index) => start + index },
@@ -166,11 +175,7 @@ const EmployeePage = () => {
         actions={<PrimaryButton onClick={handleAdd}>新增员工</PrimaryButton>}
       />
 
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
-          {error}
-        </div>
-      )}
+  {error && <Alert>{error}</Alert>}
 
       {isLoading ? (
         <div className="text-center py-12 text-gray-500">加载中...</div>
@@ -178,9 +183,11 @@ const EmployeePage = () => {
         <>
           <SearchBar>
             <input
-              type="number"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
               name="employeeId"
-              value={search.employeeId}
+              value={searchForm.employeeId}
               onChange={handleSearchChange}
               placeholder="员工编号"
               className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
@@ -188,27 +195,33 @@ const EmployeePage = () => {
             <input
               type="text"
               name="employeeName"
-              value={search.employeeName}
+              value={searchForm.employeeName}
               onChange={handleSearchChange}
               placeholder="员工姓名"
               className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
             />
-            <input
-              type="number"
+            <select
               name="level"
-              value={search.level}
+              value={searchForm.level}
               onChange={handleSearchChange}
-              placeholder="员工级别"
               className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
-            />
-            <input
-              type="number"
+            >
+              <option value="">全部级别</option>
+              {levels.map((l) => (
+                <option key={l.id} value={l.id}>{l.name}</option>
+              ))}
+            </select>
+            <select
               name="department"
-              value={search.department}
+              value={searchForm.department}
               onChange={handleSearchChange}
-              placeholder="员工部门"
               className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
-            />
+            >
+              <option value="">全部部门</option>
+              {departments.map((d) => (
+                <option key={d.id} value={d.id}>{d.name}</option>
+              ))}
+            </select>
             <PrimaryButton onClick={handleSearch}>搜索</PrimaryButton>
           </SearchBar>
 

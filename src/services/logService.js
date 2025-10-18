@@ -1,11 +1,10 @@
 // src/services/logService.js
 import axios from 'axios';
-
-const BASE_URL = 'http://localhost:8080/logs/api/logs';
+import { LOGS_BASE } from '../config/api';
 
 // 获取分页日志
 export const getLogs = async (page = 1, size = 10) => {
-  const response = await axios.get(BASE_URL, {
+  const response = await axios.get(LOGS_BASE, {
     params: {
       page,
       size,

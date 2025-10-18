@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { API_BASE } from '../config/api';
 
-const API_URL = 'http://localhost:8080/api/employees';
+const API_URL = `${API_BASE}/employees`;
 
 const filterParams = (params) => {
   return Object.fromEntries(
@@ -84,5 +85,28 @@ export const markEmployeeAsInactive = async (id) => {
   } catch (error) {
     console.error('标记员工为离职失败:', error);
     throw error;
+  }
+};
+
+// 元数据：在职/离职员工简单列表（用于映射姓名等）
+export const getActiveEmployees = async () => {
+  try {
+    const res = await axios.get(`${API_URL}/active`);
+    const list = (res.data && res.data.data) ? res.data.data : [];
+    return list;
+  } catch (e) {
+    console.warn('获取在职员工列表失败', e);
+    return [];
+  }
+};
+
+export const getInactiveEmployees = async () => {
+  try {
+    const res = await axios.get(`${API_URL}/inactive`);
+    const list = (res.data && res.data.data) ? res.data.data : [];
+    return list;
+  } catch (e) {
+    console.warn('获取离职员工列表失败', e);
+    return [];
   }
 };

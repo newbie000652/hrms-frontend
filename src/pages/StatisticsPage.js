@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import useMetaOptions from '../hooks/useMetaOptions';
 import { Pie, Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement, BarElement, CategoryScale, LinearScale } from 'chart.js';
 import { getStatistics, getPersonalReport, getDepartmentReport } from '../services/statisticsService';
 import PageHeader from '../components/Layout/PageHeader';
 import { PrimaryButton, SecondaryButton } from '../components/Layout/Buttons';
+import Alert from '../components/Layout/Alert';
 import Modal from '../components/Modal';
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement, BarElement, CategoryScale, LinearScale);
@@ -16,6 +18,7 @@ const StatisticsPage = () => {
   const [reportData, setReportData] = useState(null);
   const [reportType, setReportType] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState('');
+  const { departments } = useMetaOptions();
 
   useEffect(() => {
     const fetchStatistics = async () => {
@@ -34,7 +37,6 @@ const StatisticsPage = () => {
   const handleGeneratePersonalReport = async () => {
     try {
       const data = await getPersonalReport();
-      console.log('Personal Report Data:', data);  // 调试日志
       if (Array.isArray(data) && data.length > 0) {
         setReportData(data[0]); // 提取数组中的第一个对象
       } else {
@@ -54,6 +56,13 @@ const StatisticsPage = () => {
 
   const handleGenerateDepartmentReport = async () => {
     try {
+      if (!selectedDepartment) {
+        setError('请选择部门后再生成部门报表');
+        setReportData(null);
+        setReportType('department');
+        setModalOpen(true);
+        return;
+      }
       const data = await getDepartmentReport(selectedDepartment);
       setReportData(data);
       setReportType('department');
@@ -93,12 +102,12 @@ const StatisticsPage = () => {
   } : null;
 
   const salaryData = statistics ? {
-    labels: ['总工资'],
+    labels: ['总工资', '实际总工资'],
     datasets: [
       {
-        label: '总工资',
-        data: [statistics.totalSalary],
-        backgroundColor: '#10B981',
+        label: '金额',
+        data: [statistics.totalSalary, statistics.totalSalaryFinal || 0],
+        backgroundColor: ['#10B981', '#14B8A6'],
       },
     ],
   } : null;
@@ -118,16 +127,32 @@ const StatisticsPage = () => {
     <div className="space-y-6">
       <PageHeader title="数据统计" />
 
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
-          {error}
-        </div>
-      )}
+      {error && <Alert>{error}</Alert>}
 
       {/* 操作按钮 */}
-      <div className="flex gap-4">
-        <PrimaryButton onClick={handleGeneratePersonalReport}>生成个人报表</PrimaryButton>
-        <PrimaryButton onClick={handleGenerateDepartmentReport}>生成部门报表</PrimaryButton>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 items-center">
+        <div>
+          <PrimaryButton onClick={handleGeneratePersonalReport} className="w-full sm:w-auto rounded-md h-10">生成个人报表</PrimaryButton>
+        </div>
+        <div className="flex items-center gap-2">
+          <select
+            value={selectedDepartment}
+            onChange={(e) => setSelectedDepartment(e.target.value)}
+            className="px-3 h-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
+          >
+            <option value="">选择部门</option>
+            {departments.map((d) => (
+              <option key={d.id} value={String(d.id)}>{d.name}</option>
+            ))}
+          </select>
+          <PrimaryButton
+            onClick={handleGenerateDepartmentReport}
+            disabled={!selectedDepartment}
+            className="rounded-md h-10 whitespace-nowrap px-4"
+          >
+            生成部门报表
+          </PrimaryButton>
+        </div>
       </div>
 
       {!error && statistics && statistics.totalEmployees !== 0 && (
@@ -147,6 +172,10 @@ const StatisticsPage = () => {
               <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg p-4">
                 <div className="text-sm text-yellow-600 font-medium mb-1">总工资</div>
                 <div className="text-3xl font-bold text-yellow-700">¥{statistics.totalSalary || '0'}</div>
+              </div>
+              <div className="bg-gradient-to-br from-teal-50 to-teal-100 rounded-lg p-4">
+                <div className="text-sm text-teal-600 font-medium mb-1">实际总工资（基本+奖金-罚款）</div>
+                <div className="text-3xl font-bold text-teal-700">¥{statistics.totalSalaryFinal || '0'}</div>
               </div>
               <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4">
                 <div className="text-sm text-purple-600 font-medium mb-1">考勤率</div>
@@ -225,7 +254,7 @@ const StatisticsPage = () => {
               <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div className="font-medium text-gray-600">部门名称:</div>
-                  <div className="text-gray-800">{selectedDepartment || '人力资源部'}</div>
+                  <div className="text-gray-800">{reportData?.departmentName || '—'}</div>
                   <div className="font-medium text-gray-600">员工总数:</div>
                   <div className="text-gray-800">{reportData?.totalEmployees || '60'}</div>
                   <div className="font-medium text-gray-600">总工资:</div>

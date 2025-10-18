@@ -1,13 +1,22 @@
 // src/services/salaryService.js 
 
 import axios from 'axios';
+import { API_BASE } from '../config/api';
 
-const API_URL = 'http://localhost:8080/api/salary';
+const API_URL = `${API_BASE}/salary`;
 
-// 获取工资列表
-export const getSalaries = async (page = 1, size = 10, searchBy = '', keyword = '') => {
+// 获取工资列表（支持 employeeId/employeeName，新老参数兼容）
+export const getSalaries = async (page = 1, size = 10, params = {}) => {
+  const { employeeId, employeeName, searchBy = '', keyword = '' } = params;
   const response = await axios.get(API_URL, {
-    params: { page, size, searchBy, keyword },
+    params: {
+      page,
+      size,
+      employeeId: employeeId || undefined,
+      employeeName: employeeName || undefined,
+      searchBy: !employeeId && !employeeName ? searchBy : undefined,
+      keyword: !employeeId && !employeeName ? keyword : undefined,
+    },
   });
   return response.data;
 };

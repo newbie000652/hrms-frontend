@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { API_BASE } from '../config/api';
 
-const API_URL = 'http://localhost:8080/api/statistics';
+const API_URL = `${API_BASE}/statistics`;
 
 export const getStatistics = async () => {
   const response = await axios.get(`${API_URL}`);
@@ -21,9 +22,13 @@ export const getPersonalReport = async () => {
   }
 };
 
-export const getDepartmentReport = async (department) => {
-  const response = await axios.get(`${API_URL}/department`, {
-    params: { department },
-  });
+export const getDepartmentReport = async (departmentNameOrId) => {
+  // If it's a number-like string, send as departmentId; otherwise send as departmentName
+  const asNumber = Number(departmentNameOrId);
+  const params = Number.isFinite(asNumber) && String(asNumber) === String(departmentNameOrId)
+    ? { departmentId: asNumber }
+    : { departmentName: departmentNameOrId };
+
+  const response = await axios.get(`${API_URL}/department`, { params });
   return response.data;
 };

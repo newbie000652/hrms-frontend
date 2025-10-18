@@ -3,6 +3,7 @@ import { getPerformanceRecords, createPerformanceRecord, updatePerformanceRecord
 import PageHeader from '../components/Layout/PageHeader';
 import SearchBar from '../components/Layout/SearchBar';
 import Table from '../components/Layout/Table';
+import Alert from '../components/Layout/Alert';
 import { PrimaryButton, SecondaryButton } from '../components/Layout/Buttons';
 import Modal from '../components/Modal';
 import Pagination from '../components/Pagination';
@@ -17,14 +18,18 @@ const PerformancePage = () => {
     const [totalPages, setTotalPages] = useState(1);
     const [totalRecords, setTotalRecords] = useState(0);
     const [pageSize, setPageSize] = useState(10);
-    const [search, setSearch] = useState({ searchBy: '', keyword: '' });
+    const [searchForm, setSearchForm] = useState({ employeeId: '', employeeName: '' });
+    const [searchQuery, setSearchQuery] = useState({ employeeId: '', employeeName: '' });
 
     useEffect(() => {
         const fetchPerformanceData = async () => {
             try {
-                const data = await getPerformanceRecords(currentPage, pageSize, search.searchBy, search.keyword);
+                const data = await getPerformanceRecords(currentPage, pageSize, {
+                    employeeId: searchQuery.employeeId ? Number(searchQuery.employeeId) : undefined,
+                    employeeName: searchQuery.employeeName || undefined,
+                });
                 setPerformanceData(data.records);
-                setTotalPages(data.pages || Math.ceil(data.total / pageSize));
+                setTotalPages(Math.ceil(data.total / pageSize));
                 setTotalRecords(data.total);
             } catch (err) {
                 setError('加载绩效数据失败');
@@ -36,7 +41,7 @@ const PerformancePage = () => {
             }
         };
         fetchPerformanceData();
-    }, [currentPage, pageSize, search]);
+    }, [currentPage, pageSize, searchQuery]);
 
     const handleSavePerformance = async (performance) => {
         try {
@@ -57,7 +62,13 @@ const PerformancePage = () => {
     };
 
     const handleEdit = (performance) => {
-        setEditingPerformance(performance);
+        // 自动补充领导ID（从本地存储或默认值）
+        const leaderId = localStorage.getItem('employeeId');
+        const enriched = {
+            ...performance,
+            leaderId: performance.leaderId ?? (leaderId ? Number(leaderId) : undefined),
+        };
+        setEditingPerformance(enriched);
         setModalOpen(true);
     };
 
@@ -71,11 +82,12 @@ const PerformancePage = () => {
     };
 
     const handleSearchChange = (e) => {
-        setSearch({ ...search, [e.target.name]: e.target.value });
+        setSearchForm({ ...searchForm, [e.target.name]: e.target.value });
     };
 
     const handleSearch = () => {
         setCurrentPage(1);
+        setSearchQuery(searchForm);
     };
 
     // 计算当前页的记录序号范围
@@ -85,7 +97,7 @@ const PerformancePage = () => {
         return { start, end };
     };
 
-    const { start, end } = getRecordRange();
+    const { start } = getRecordRange();
 
     const columns = [
         { label: '序号', field: 'index', width: '60px', render: (row, index) => start + index },
@@ -103,11 +115,7 @@ const PerformancePage = () => {
         <div className="space-y-5">
             <PageHeader title="绩效管理" />
 
-            {error && (
-                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
-                    {error}
-                </div>
-            )}
+            {error && <Alert>{error}</Alert>}
 
             {isLoading ? (
                 <div className="text-center py-12 text-gray-500">加载中...</div>
@@ -116,18 +124,20 @@ const PerformancePage = () => {
                     <SearchBar>
                         <input
                             type="text"
-                            name="searchBy"
-                            value={search.searchBy}
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            name="employeeId"
+                            value={searchForm.employeeId}
                             onChange={handleSearchChange}
-                            placeholder="搜索字段"
+                            placeholder="按员工ID精确查询"
                             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
                         />
                         <input
                             type="text"
-                            name="keyword"
-                            value={search.keyword}
+                            name="employeeName"
+                            value={searchForm.employeeName}
                             onChange={handleSearchChange}
-                            placeholder="关键词"
+                            placeholder="按姓名模糊查询"
                             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
                         />
                         <PrimaryButton onClick={handleSearch}>搜索</PrimaryButton>
@@ -153,6 +163,26 @@ const PerformancePage = () => {
             {modalOpen && (
                 <Modal title="编辑绩效" onClose={() => setModalOpen(false)}>
                     <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">领导ID</label>
+                                <input
+                                    type="text"
+                                    value={editingPerformance?.leaderId ?? ''}
+                                    disabled
+                                    className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-md"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">评审日期</label>
+                                <input
+                                    type="text"
+                                    value={editingPerformance?.reviewDate ?? ''}
+                                    disabled
+                                    className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-md"
+                                />
+                            </div>
+                        </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">评分</label>
                             <input

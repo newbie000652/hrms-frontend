@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { API_BASE } from '../config/api';
 
-const API_URL = 'http://localhost:8080/api/attendance';
+const API_URL = `${API_BASE}/attendance`;
 
 export const getAttendanceRecords = async (filter, page = 1, size = 10) => {
     const response = await axios.get(API_URL, {

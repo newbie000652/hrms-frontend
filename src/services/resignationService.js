@@ -1,8 +1,9 @@
 // src/services/resignationService.js
 
 import axios from 'axios';
+import { API_BASE } from '../config/api';
 
-const API_URL = 'http://localhost:8080/api/resignations';
+const API_URL = `${API_BASE}/resignations`;
 
 // 获取离职员工列表
 export const getResignations = async (page = 1, size = 10, search = {}) => {

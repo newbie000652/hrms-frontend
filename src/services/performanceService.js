@@ -1,13 +1,24 @@
 // src/services/performanceService.js  
 
 import axios from 'axios';
+import { API_BASE } from '../config/api';
 
-const API_URL = 'http://localhost:8080/api/performance';
+const API_URL = `${API_BASE}/performance`;
 
-// 获取绩效记录
-export const getPerformanceRecords = async (page = 1, size = 10, searchBy = '', keyword = '') => {
+// 获取绩效记录（支持新参数 employeeId/employeeName，兼容旧的 searchBy/keyword）
+export const getPerformanceRecords = async (page = 1, size = 10, params = {}) => {
+    const { employeeId, employeeName, searchBy = '', keyword = '' } = params;
     const response = await axios.get(API_URL, {
-        params: { page, size, searchBy, keyword },
+        params: {
+            page,
+            size,
+            // 优先发送新参数
+            employeeId: employeeId || undefined,
+            employeeName: employeeName || undefined,
+            // 兼容旧参数
+            searchBy: !employeeId && !employeeName ? searchBy : undefined,
+            keyword: !employeeId && !employeeName ? keyword : undefined,
+        },
     });
     return response.data;
 };

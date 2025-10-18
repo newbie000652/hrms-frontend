@@ -1,6 +1,6 @@
 // src/pages/SalaryPage.js
 import React, { useEffect, useState } from 'react';
-import { getSalaries, createDefaultSalary, calculateSalary, updateSalary, deleteSalary } from '../services/salaryService';
+import { getSalaries, createDefaultSalary, updateSalary, deleteSalary } from '../services/salaryService';
 import PageHeader from '../components/Layout/PageHeader';
 import SearchBar from '../components/Layout/SearchBar';
 import Table from '../components/Layout/Table';
@@ -19,20 +19,19 @@ const SalaryPage = () => {
     const [totalPages, setTotalPages] = useState(1);
     const [totalRecords, setTotalRecords] = useState(0);
     const [pageSize, setPageSize] = useState(10);
-    const [search, setSearch] = useState({ searchBy: '', keyword: '' });
+    const [searchForm, setSearchForm] = useState({ employeeId: '', employeeName: '' });
+    const [searchQuery, setSearchQuery] = useState({ employeeId: '', employeeName: '' });
 
     useEffect(() => {
         const fetchSalaries = async () => {
             try {
-                console.log('Fetching salaries with params:', { currentPage, pageSize, search });
-                const data = await getSalaries(currentPage, pageSize, search.searchBy, search.keyword);
-                console.log('Received salary data:', data);
-                console.log('Data records:', data.records);
-                console.log('Data total:', data.total);
-                console.log('Data pages:', data.pages);
+                const data = await getSalaries(currentPage, pageSize, {
+                    employeeId: searchQuery.employeeId ? Number(searchQuery.employeeId) : undefined,
+                    employeeName: searchQuery.employeeName || undefined,
+                });
                 
                 setSalaries(data.records || []);
-                setTotalPages(data.pages || Math.ceil((data.total || 0) / pageSize));
+                setTotalPages(Math.ceil((data.total || 0) / pageSize));
                 setTotalRecords(data.total || 0);
             } catch (err) {
                 console.error('Error fetching salaries:', err);
@@ -45,7 +44,7 @@ const SalaryPage = () => {
             }
         };
         fetchSalaries();
-    }, [currentPage, pageSize, search]);
+    }, [currentPage, pageSize, searchQuery]);
 
     const handleSaveSalary = async (salary) => {
         try {
@@ -89,11 +88,12 @@ const SalaryPage = () => {
     };
 
     const handleSearchChange = (e) => {
-        setSearch({ ...search, [e.target.name]: e.target.value });
+        setSearchForm({ ...searchForm, [e.target.name]: e.target.value });
     };
 
     const handleSearch = () => {
         setCurrentPage(1);
+        setSearchQuery(searchForm);
     };
 
     // 计算当前页的记录序号范围
@@ -103,7 +103,7 @@ const SalaryPage = () => {
         return { start, end };
     };
 
-    const { start, end } = getRecordRange();
+    const { start } = getRecordRange();
 
     const columns = [
         { label: '序号', field: 'index', width: '60px', render: (row, index) => start + index },
@@ -137,18 +137,20 @@ const SalaryPage = () => {
                     <SearchBar>
                         <input
                             type="text"
-                            name="searchBy"
-                            value={search.searchBy}
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            name="employeeId"
+                            value={searchForm.employeeId}
                             onChange={handleSearchChange}
-                            placeholder="搜索字段"
+                            placeholder="按员工ID精确查询"
                             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
                         />
                         <input
                             type="text"
-                            name="keyword"
-                            value={search.keyword}
+                            name="employeeName"
+                            value={searchForm.employeeName}
                             onChange={handleSearchChange}
-                            placeholder="关键字"
+                            placeholder="按姓名模糊查询"
                             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
                         />
                         <PrimaryButton onClick={handleSearch}>搜索</PrimaryButton>

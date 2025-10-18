@@ -1,11 +1,24 @@
 import axios from 'axios';
+import { API_BASE } from '../config/api';
 
-const API_URL = 'http://localhost:8080/api/accounts';
+const API_URL = `${API_BASE}/accounts`;
 
-// 获取账户列表
-export const getAccounts = async (page = 1, size = 10, accountId = '') => {
+// 获取账户列表（多字段搜索）
+export const getAccounts = async (
+    page = 1,
+    size = 10,
+    params = {}
+) => {
+    const { accountId, account, employeeId, role } = params || {};
     const response = await axios.get(API_URL, {
-        params: { page, size, accountId },
+        params: {
+            page,
+            size,
+            accountId: accountId || undefined,
+            account: account || undefined,
+            employeeId: employeeId || undefined,
+            role: role || undefined,
+        },
     });
     return response.data;
 };

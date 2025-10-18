@@ -1,17 +1,16 @@
 // src/services/authService.js
 import axios from 'axios';
-
-const API_BASE_URL = 'http://localhost:8080/api'; // API base URL 
+import { API_BASE } from '../config/api';
 
 // 登录接口，登录时存储 employeeId 和 token
 export const login = async (username, password) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/login`, {
+  const response = await axios.post(`${API_BASE}/login`, {
       username,
       password,
     });
 
-    const { success, token, role, employeeId } = response.data;
+  const { success, token, employeeId } = response.data;
 
     if (success) {
       // 登录成功后存储 token 和 employeeId

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import useMetaOptions from '../hooks/useMetaOptions';
 import { getResignations, getResignationDetails } from '../services/resignationService';
 import PageHeader from '../components/Layout/PageHeader';
 import SearchBar from '../components/Layout/SearchBar';
 import Table from '../components/Layout/Table';
 import { PrimaryButton, SecondaryButton } from '../components/Layout/Buttons';
 import Modal from '../components/Modal';
+import Alert from '../components/Layout/Alert';
 import Pagination from '../components/Pagination';
 
 const ResignationPage = () => {
@@ -17,12 +19,14 @@ const ResignationPage = () => {
     const [totalPages, setTotalPages] = useState(1);
     const [totalRecords, setTotalRecords] = useState(0);
     const [pageSize, setPageSize] = useState(10);
-    const [search, setSearch] = useState({ employeeId: '', employeeName: '', level: '', department: '' });
+    const [searchForm, setSearchForm] = useState({ employeeId: '', employeeName: '', level: '', department: '' });
+    const [searchQuery, setSearchQuery] = useState({ employeeId: '', employeeName: '', level: '', department: '' });
+    const { levels, departments } = useMetaOptions();
 
     useEffect(() => {
         const fetchResignations = async () => {
             try {
-                const data = await getResignations(currentPage, pageSize, search);
+                const data = await getResignations(currentPage, pageSize, searchQuery);
                 setResignations(data.records);
                 setTotalRecords(data.total);
                 // 计算总页数
@@ -42,7 +46,9 @@ const ResignationPage = () => {
             }
         };
         fetchResignations();
-    }, [currentPage, pageSize, search]);
+    }, [currentPage, pageSize, searchQuery]);
+
+    // 元数据通过 hook 加载
 
     const handleViewDetails = async (id) => {
         try {
@@ -64,11 +70,12 @@ const ResignationPage = () => {
     };
 
     const handleSearchChange = (e) => {
-        setSearch({ ...search, [e.target.name]: e.target.value });
+        setSearchForm({ ...searchForm, [e.target.name]: e.target.value });
     };
 
     const handleSearch = () => {
-        setCurrentPage(1);
+    setCurrentPage(1);
+    setSearchQuery(searchForm);
     };
 
     // 计算当前页的记录序号范围
@@ -78,7 +85,7 @@ const ResignationPage = () => {
         return { start, end };
     };
 
-    const { start, end } = getRecordRange();
+    const { start } = getRecordRange();
 
     const columns = [
         { label: '序号', field: 'index', width: '60px', render: (row, index) => start + index },
@@ -96,11 +103,7 @@ const ResignationPage = () => {
         <div className="space-y-5">
             <PageHeader title="离职管理" />
 
-            {error && (
-                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
-                    {error}
-                </div>
-            )}
+            {error && <Alert>{error}</Alert>}
 
             {isLoading ? (
                 <div className="text-center py-12 text-gray-500">加载中...</div>
@@ -109,8 +112,10 @@ const ResignationPage = () => {
                     <SearchBar>
                         <input
                             type="text"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
                             name="employeeId"
-                            value={search.employeeId}
+                            value={searchForm.employeeId}
                             onChange={handleSearchChange}
                             placeholder="员工ID"
                             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
@@ -118,27 +123,33 @@ const ResignationPage = () => {
                         <input
                             type="text"
                             name="employeeName"
-                            value={search.employeeName}
+                            value={searchForm.employeeName}
                             onChange={handleSearchChange}
                             placeholder="员工姓名"
                             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
                         />
-                        <input
-                            type="text"
+                        <select
                             name="level"
-                            value={search.level}
+                            value={searchForm.level}
                             onChange={handleSearchChange}
-                            placeholder="员工级别"
                             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
-                        />
-                        <input
-                            type="text"
+                        >
+                            <option value="">全部级别</option>
+                            {levels.map((l) => (
+                                <option key={l.id} value={l.id}>{l.name}</option>
+                            ))}
+                        </select>
+                        <select
                             name="department"
-                            value={search.department}
+                            value={searchForm.department}
                             onChange={handleSearchChange}
-                            placeholder="员工部门"
                             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
-                        />
+                        >
+                            <option value="">全部部门</option>
+                            {departments.map((d) => (
+                                <option key={d.id} value={d.id}>{d.name}</option>
+                            ))}
+                        </select>
                         <PrimaryButton onClick={handleSearch}>搜索</PrimaryButton>
                     </SearchBar>
 

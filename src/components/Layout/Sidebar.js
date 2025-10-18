@@ -100,9 +100,7 @@ const Sidebar = () => {
     allowedRoutes.includes(item.path)
   );
 
-  const toggleMobileMenu = () => {
-    setIsMobileOpen(!isMobileOpen);
-  };
+  // 如需在移动端添加菜单按钮，可直接 setIsMobileOpen((v) => !v)
 
   const closeMobileMenu = () => {
     setIsMobileOpen(false);
